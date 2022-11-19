@@ -12,8 +12,7 @@ shinyUI(fluidPage(
   
     fluidRow(
       column(3,
-        numericInput("user_guess", "Guess a number: ", value = 0),
-        actionButton("submit", "submit")
+
       ), 
     )
     
