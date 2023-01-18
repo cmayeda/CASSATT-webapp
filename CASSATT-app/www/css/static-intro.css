@@ -1,0 +1,19 @@
+/* Styling for Steps 1-4 */ 
+#raw_thumbnails .row {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+#raw_thumbnails .col-sm-3 {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+#raw_thumbnails h6 {
+  margin-bottom: 3px;
+}
+
+#tissue-reg-cartoon {
+  max-width: 68%;
+}
+#cell-reg-cartoon {
+  max-width: 80%;
+}
