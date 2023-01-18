@@ -54,18 +54,42 @@ shinyUI(fluidPage(
               column(4,
                   tags$img(src = "assets/fig1-A.jpg")
               ),
-              column(4,
+              column(4, id = "raw_thumbnails", 
                   fluidRow(
-                      column(3, tags$img(src = "")),
-                      column(3, tags$img(src = "")),
-                      column(3, tags$img(src = "")),
-                      column(3, tags$img(src = "")),
+                      column(3,
+                          tags$h6("CD3"),
+                          tags$img(src = "assets/raw_thumbnails/raw_CD3_thumbnail.jpg")
+                      ),
+                      column(3,
+                          tags$h6("CD3"),
+                          tags$img(src = "assets/raw_thumbnails/raw_CD4_thumbnail.jpg")
+                      ),
+                      column(3,
+                          tags$h6("CD8"),
+                          tags$img(src = "assets/raw_thumbnails/raw_CD8_thumbnail.jpg")
+                      ),
+                      column(3,
+                          tags$h6("CD68"),
+                          tags$img(src = "assets/raw_thumbnails/raw_CD68_thumbnail.jpg")
+                      ),
                   ),
                   fluidRow(
-                    column(3, tags$img(src = "")),
-                    column(3, tags$img(src = "")),
-                    column(3, tags$img(src = "")),
-                    column(3, tags$img(src = "")),
+                    column(3, 
+                        tags$h6("FoxP3"),
+                        tags$img(src = "assets/raw_thumbnails/raw_FoxP3_thumbnail.jpg")
+                    ),
+                    column(3, 
+                        tags$h6("Iba-1"),
+                        tags$img(src = "assets/raw_thumbnails/raw_Iba-1_thumbnail.jpg")
+                    ),
+                    column(3, 
+                        tags$h6("PD-1"),
+                        tags$img(src = "assets/raw_thumbnails/raw_PD-1_thumbnail.jpg")
+                    ),
+                    column(3,
+                        tags$h6("PD-L1"),
+                        tags$img(src = "assets/raw_thumbnails/raw_PD-L1_thumbnail.jpg")
+                    ),
                   )
               ),
               column(4,
