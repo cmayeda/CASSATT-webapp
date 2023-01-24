@@ -3,9 +3,10 @@
 # 11/18/2022 
 
 library(shiny)
+library(shinyjs)
 
 shinyUI(fluidPage(
-
+  useShinyjs(),
   titlePanel("", windowTitle = "CASSATT"),
   tags$head(
     tags$link(rel="stylesheet", type="text/css", href="css/style.css"),
@@ -176,8 +177,8 @@ shinyUI(fluidPage(
             column(4,
                 tags$img(src = "assets/fig1-C-segmentation.jpg")
             ),
-            column(4,
-                tags$img(src = "assets/fig4-mask.jpg")
+            column(4, id = "stardist",
+                tags$img(src = "assets/stardist_mask.jpg")
             ),
             column(4,
                 tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 
@@ -187,6 +188,31 @@ shinyUI(fluidPage(
             ) 
          )
       )
+  ),
+  
+  # -- STEP 5 -- 
+  fluidRow(
+    column(10, offset = 1, 
+           tags$h3("Step 5: Cell Feature Expression")
+    )
+  ),
+  fluidRow(
+    column(10, offset = 1,
+           fluidRow(
+             column(4,
+                    tags$img(src = "assets/fig1-C-segmentation.jpg")
+             ),
+             column(4, id = "stardist",
+                    tags$img(src = "assets/stardist_mask.jpg")
+             ),
+             column(4,
+                    tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 
+                mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. Etiam ac turpis bibendum, fermentum 
+                enim vitae, feugiat nulla. Morbi pharetra euismod dictum. Class aptent taciti sociosqu ad litora torquent per 
+                conubia nostra, per inceptos himenaeos.")
+             ) 
+           )
+    )
   ),
     
 ))

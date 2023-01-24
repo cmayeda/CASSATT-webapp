@@ -20,3 +20,6 @@
   aspect-ratio: 1/1;
   max-width: 83%; /* to match tissue detection fig */ 
 }
+#stardist img {
+  max-width: 83%;
+}
