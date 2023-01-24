@@ -117,17 +117,17 @@ shinyUI(fluidPage(
                           tags$img(id = "tissue-reg-cartoon", src = "assets/fig1-B-tissue.jpg"),       
                       ),
                       column(6,
-                          tags$img(src = "assets/fig2-A-tissue-reg.jpg"),    
+                          tags$img(src = "assets/fig2-A-tissue-modified.jpg"),    
                       )
                   ),
-                  fluidRow(
-                      column(6,
-                          tags$img(id = "cell-reg-cartoon", src = "assets/fig1-B-cell.jpg") 
-                      ),
-                      column(6,
-                          tags$img(src = "assets/fig3-A-keypoints.jpg")
-                      )
-                  )
+                  # fluidRow(
+                  #     column(6,
+                  #         tags$img(id = "cell-reg-cartoon", src = "assets/fig1-B-cell.jpg") 
+                  #     ),
+                  #     column(6,
+                  #         tags$img(src = "assets/fig3-A-keypoints.jpg")
+                  #     )
+                  # )
               ), 
               column(4,
                   tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 
@@ -148,10 +148,11 @@ shinyUI(fluidPage(
   fluidRow(
       column(10, offset = 1,
           fluidRow(
-              column(4,
-                  tags$img(src = "assets/fig1-A.jpg")
+              column(4, id = "tiled",
+                  tags$img(src = "assets/tiled_PD-1.jpg")
               ),
               column(4,
+                  tags$img(src = "assets/tissue_detection.jpg")
               ),
               column(4,
                   tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 
