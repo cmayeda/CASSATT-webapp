@@ -3,7 +3,8 @@
   margin-left: 0px;
   margin-right: 0px;
 }
-#raw_thumbnails .col-sm-3 {
+#raw_thumbnails .col-sm-3,
+#feature_expr .col-sm-3 {
   padding-left: 0px;
   padding-right: 0px;
 }

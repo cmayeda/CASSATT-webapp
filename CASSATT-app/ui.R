@@ -62,7 +62,7 @@ shinyUI(fluidPage(
                           tags$img(src = "assets/raw_thumbnails/raw_CD3_thumbnail.jpg")
                       ),
                       column(3,
-                          tags$h6("CD3"),
+                          tags$h6("CD4"),
                           tags$img(src = "assets/raw_thumbnails/raw_CD4_thumbnail.jpg")
                       ),
                       column(3,
@@ -199,11 +199,43 @@ shinyUI(fluidPage(
   fluidRow(
     column(10, offset = 1,
            fluidRow(
-             column(4,
-                    tags$img(src = "assets/fig1-C-segmentation.jpg")
-             ),
-             column(4, id = "stardist",
-                    tags$img(src = "assets/stardist_mask.jpg")
+             column(8, id = "feature_expr", 
+                  fluidRow(
+                      column(3,
+                          tags$h6("CD3"),
+                          plotOutput("expr_CD3", height = "100%")
+                      ),
+                      column(3,
+                          tags$h6("CD4"),
+                          plotOutput("expr_CD4", height = "100%")
+                      ),
+                      column(3,
+                          tags$h6("CD8"),
+                          plotOutput("expr_CD8", height = "100%")
+                      ),
+                      column(3,
+                          tags$h6("CD68"),
+                          plotOutput("expr_CD68", height = "100%")
+                      ),
+                  ),
+                  fluidRow(
+                      column(3, 
+                          tags$h6("FoxP3"),
+                          plotOutput("expr_FoxP3", height = "100%")
+                      ),
+                      column(3, 
+                          tags$h6("Iba-1"),
+                          plotOutput("expr_Iba1", height = "100%")
+                      ),
+                      column(3, 
+                          tags$h6("PD-1"),
+                          plotOutput("expr_PD", height = "100%")
+                      ),
+                      column(3,
+                          tags$h6("PD-L1"),
+                          plotOutput("expr_PDL", height = "100%")
+                      ),
+                    ),
              ),
              column(4,
                     tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 
