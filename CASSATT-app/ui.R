@@ -192,14 +192,14 @@ shinyUI(fluidPage(
   
   # -- STEP 5 -- 
   fluidRow(
-    column(10, offset = 1, 
-           tags$h3("Step 5: Cell Feature Expression")
-    )
+      column(10, offset = 1, 
+          tags$h3("Step 5: Cell Feature Expression")
+      )
   ),
   fluidRow(
-    column(10, offset = 1,
-           fluidRow(
-             column(8, id = "feature_expr", 
+      column(10, offset = 1,
+          fluidRow(
+              column(8, id = "feature_expr", 
                   fluidRow(
                       column(3,
                           tags$h6("CD3"),
@@ -243,8 +243,8 @@ shinyUI(fluidPage(
                 enim vitae, feugiat nulla. Morbi pharetra euismod dictum. Class aptent taciti sociosqu ad litora torquent per 
                 conubia nostra, per inceptos himenaeos.")
              ) 
-           )
-    )
+          )
+      )
   ),
     
 ))
