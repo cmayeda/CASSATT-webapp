@@ -13,7 +13,10 @@ neighborhood_clickable_ui <- function(id) {
                       selectInput(ns("method"),
                                   label = "Select a neighborhood identification method",
                                   choices = c("voronoi", "shell", "knn"),
-                                  selected = "voronoi")
+                                  selected = "voronoi"),
+                      numericInput(ns("cluster_size"), 
+                                   label = "Cluster size",
+                                   value = 5, min = 3, max = 100),
                   )
               ),
               column(4, 
