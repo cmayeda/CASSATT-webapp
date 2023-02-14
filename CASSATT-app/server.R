@@ -1,20 +1,13 @@
 library(shiny)
 library(shinyjs)
-library(reticulate)
 
 shinyServer(function(input, output, session) {
-
-  # virtualenv_create("py_env")
-  # use_virtualenv("py_env", required = TRUE)
-  
-  # source_python("guessing_functions.py")
 
   rv <- reactiveValues(
     expr_img_list = paste0("www/assets/feature_expr/", list.files("www/assets/feature_expr/", pattern = ".jpg")),
     cluster_plot = paste0("www/assets/clusters_summertime.png"),
     cluster_legend = paste0("www/assets/clusters_summertime_legend.png")
   )
-  
   
   # -- Help Text -- 
   observeEvent(input$hide_help, {
@@ -57,4 +50,7 @@ shinyServer(function(input, output, session) {
   callModule(neighborhood_clickable_server, "neighborhood_clickable",
              n_data = neighborhood_data)
   
+  # module to run Python code 
+  callModule(neighborhood_python_server, "neighborhood_py")
+
 })

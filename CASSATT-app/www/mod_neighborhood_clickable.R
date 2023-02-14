@@ -9,7 +9,7 @@ neighborhood_clickable_ui <- function(id) {
       fluidRow(
           column(10, offset = 1,
               column(4,
-                  plotOutput(ns("neighborhood"), click = "plot_click")
+                  plotOutput(ns("neighborhood"), click = ns("plot_click"))
               ),
               column(4, 
                   tags$div(class = "config_menu",
@@ -19,7 +19,7 @@ neighborhood_clickable_ui <- function(id) {
                                   selected = "voronoi"),
                       numericInput(ns("cluster_size"), 
                                    label = "Cluster size",
-                                   value = 5, min = 3, max = 100),
+                                   value = 10, min = 3, max = 100),
                   )
               ),
               column(4, 
@@ -48,8 +48,9 @@ neighborhood_clickable_server <- function(input, output, session,
   }, ignoreNULL = FALSE, ignoreInit = FALSE, once = TRUE)
   
   observe({
-    np <- nearPoints(n_data, input$plot_click, maxpoints = 1, addDist = FALSE) 
+    np <- nearPoints(n_data, input$plot_click, maxpoints = 1, addDist = FALSE)
     str(np)
+    
     # if (nrow(np) <= 0) { 
     #   rv$ggClickable <<- ggplot(tSNE_plot()) + 
     #     coord_fixed() +

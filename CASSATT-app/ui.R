@@ -5,7 +5,8 @@
 library(shiny)
 library(shinyjs)
 
-source("www/neighborhood_clickable.R")
+source("www/mod_neighborhood_clickable.R")
+source("www/mod_neighborhood_python.R")
 
 shinyUI(fluidPage(
   useShinyjs(),
