@@ -1,4 +1,7 @@
-library(shiny)
+library(ggplot2)
+
+source("www/custom_themes_palettes.R")
+neighborhood_data = read.csv("www/neighborhood_data.csv")
 
 neighborhood_clickable_ui <- function(id) {
   ns <- NS(id)
@@ -6,7 +9,7 @@ neighborhood_clickable_ui <- function(id) {
       fluidRow(
           column(10, offset = 1,
               column(4,
-                  plotOutput(ns("neighborhood"), height = "100%", click = "plot_click")
+                  plotOutput(ns("neighborhood"), click = "plot_click")
               ),
               column(4, 
                   tags$div(class = "config_menu",
@@ -30,27 +33,39 @@ neighborhood_clickable_ui <- function(id) {
   )
 }
 
-neighborhood_clickable_server <- function(input, output, session) {
+neighborhood_clickable_server <- function(input, output, session,
+                                          n_data) {
   
   rv <- reactiveValues(ggClickable = ggplot())
   
+  # plot for first load 
+  observeEvent( input$plot_click, {
+    rv$ggClickable <<- ggplot(n_data, aes(x = Global_x, y = Global_y, col = as.factor(pop_ID))) + 
+      coord_fixed() + 
+      geom_point(cex = 2.5) + 
+      scale_color_manual(values = summertime_palette(14)) + 
+      scale_y_reverse() + 
+      theme_clickable() 
+  }, ignoreNULL = FALSE, ignoreInit = FALSE, once = TRUE)
+  
   observe({
-    np <- nearPoints(tSNE_plot(), plot_click(), maxpoints = 1, addDist = FALSE)
-    if (nrow(np) <= 0) { 
-      rv$ggClickable <<- ggplot(tSNE_plot()) + 
-        coord_fixed() +
-        geom_point(aes(x = x, y = y, color = fSOM_clusters()), cex = 3) +
-        scale_color_manual(values = my_magma()) +
-        theme_clickable()
-    } else {
-      rv$ggClickable <<- ggplot(tSNE_plot()) +
-        coord_fixed() +
-        geom_point(aes(x = x, y = y, color = fSOM_clusters()), cex = 3) +
-        scale_color_manual(values = my_magma()) +
-        geom_point(cluster_set, mapping = aes(x = x, y = y),
-                   fill = fill_color, cex = 3, shape = 21, color = "#005CCB") +
-        theme_clickable()
-    }
+    np <- nearPoints(n_data, input$plot_click, maxpoints = 1, addDist = FALSE) 
+    str(np)
+    # if (nrow(np) <= 0) { 
+    #   rv$ggClickable <<- ggplot(tSNE_plot()) + 
+    #     coord_fixed() +
+    #     geom_point(aes(x = x, y = y, color = fSOM_clusters()), cex = 3) +
+    #     scale_color_manual(values = my_magma()) +
+    #     theme_clickable()
+    # } else {
+    #   rv$ggClickable <<- ggplot(tSNE_plot()) +
+    #     coord_fixed() +
+    #     geom_point(aes(x = x, y = y, color = fSOM_clusters()), cex = 3) +
+    #     scale_color_manual(values = my_magma()) +
+    #     geom_point(cluster_set, mapping = aes(x = x, y = y),
+    #                fill = fill_color, cex = 3, shape = 21, color = "#005CCB") +
+    #     theme_clickable()
+    # }
   })
   
   output$neighborhood <- renderPlot({

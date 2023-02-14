@@ -15,7 +15,7 @@ neighbor_data = do.call(rbind, lapply(list.files(), read.csv))
 
 ```{r, subset & export data}
 export_df = neighbor_data[, c("Global_x","Global_y","pop_ID")]
-write.csv(neighbor_data, "CASSATT-app/www/neighborhood_data.csv", row.names = FALSE)
+write.csv(export_df, "CASSATT-app/www/neighborhood_data.csv", row.names = FALSE)
 ```
 
 
