@@ -10,7 +10,9 @@ shinyServer(function(input, output, session) {
   # source_python("guessing_functions.py")
 
   rv <- reactiveValues(
-    expr_img_list = paste0("www/assets/feature_expr/", list.files("www/assets/feature_expr/", pattern = ".jpg"))
+    expr_img_list = paste0("www/assets/feature_expr/", list.files("www/assets/feature_expr/", pattern = ".jpg")),
+    cluster_plot = paste0("www/assets/clusters_summertime.png"),
+    cluster_legend = paste0("www/assets/clusters_summertime_legend.png")
   )
   
   
@@ -28,8 +30,12 @@ shinyServer(function(input, output, session) {
   observeEvent(input$colorblind, {
     if (input$colorblind %% 2 == 1) {
       rv$expr_img_list <<- paste0("www/assets/feature_expr/colorblind/", list.files("www/assets/feature_expr/colorblind/", pattern = ".jpg"))
+      rv$cluster_plot <<- paste0("www/assets/clusters_colorblind.png")
+      rv$cluster_legend <<- paste0("www/assets/clusters_colorblind_legend.png")
     } else {
       rv$expr_img_list <<- paste0("www/assets/feature_expr/", list.files("www/assets/feature_expr/", pattern = ".jpg"))
+      rv$cluster_plot <<- paste0("www/assets/clusters_summertime.png")
+      rv$cluster_legend <<- paste0("www/assets/clusters_summertime_legend.png")
     }
   })
   
@@ -42,5 +48,9 @@ shinyServer(function(input, output, session) {
   output$expr_Iba1 <- renderImage({ list(src = rv$expr_img_list[6]) }, deleteFile = FALSE)
   output$expr_PD <- renderImage({ list(src = rv$expr_img_list[7]) }, deleteFile = FALSE)
   output$expr_PDL <- renderImage({ list(src = rv$expr_img_list[8]) }, deleteFile = FALSE)
+  
+  # -- 6: Population Identification -- 
+  output$cluster_plot <- renderImage({ list(src = rv$cluster_plot)}, deleteFile = FALSE)
+  output$cluster_legend <- renderImage({ list(src = rv$cluster_legend)}, deleteFile = FALSE)
   
 })
