@@ -49,8 +49,11 @@ shinyServer(function(input, output, session) {
   output$expr_PD <- renderImage({ list(src = rv$expr_img_list[7]) }, deleteFile = FALSE)
   output$expr_PDL <- renderImage({ list(src = rv$expr_img_list[8]) }, deleteFile = FALSE)
   
-  # -- 6: Population Identification -- 
+  # -- 6: Population ID -- 
   output$cluster_plot <- renderImage({ list(src = rv$cluster_plot)}, deleteFile = FALSE)
   output$cluster_legend <- renderImage({ list(src = rv$cluster_legend)}, deleteFile = FALSE)
+  
+  # -- 7: Neighborhood ID & Analysis -- 
+  callModule(neighborhood_clickable_server, "neighborhood_clickable")
   
 })

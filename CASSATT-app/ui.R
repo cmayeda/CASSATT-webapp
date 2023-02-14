@@ -5,6 +5,8 @@
 library(shiny)
 library(shinyjs)
 
+source("www/neighborhood_clickable.R")
+
 shinyUI(fluidPage(
   useShinyjs(),
   titlePanel("", windowTitle = "CASSATT"),
@@ -43,7 +45,7 @@ shinyUI(fluidPage(
       )
   ),
   
-  # -- STEP 1 -- 
+  # -- STEP 1: Data Collection -- 
   fluidRow(
       column(10, offset = 1, 
           tags$h3("Step 1: Cyclic IHD Data Collection")
@@ -103,7 +105,7 @@ shinyUI(fluidPage(
       )
   ),
   
-  # -- STEP 2 -- 
+  # -- STEP 2: Image Registration -- 
   fluidRow(
       column(10, offset = 1, 
           tags$h3("Step 2: Image Registration")
@@ -140,7 +142,7 @@ shinyUI(fluidPage(
       )
   ),
   
-  # -- STEP 3 -- 
+  # -- STEP 3: Tile & Tissue Detection -- 
   fluidRow(
       column(10, offset = 1, 
           tags$h3("Step 3: Tile & Tissue Detection")
@@ -165,7 +167,7 @@ shinyUI(fluidPage(
       )
   ),
   
-  # -- STEP 4 -- 
+  # -- STEP 4: Cell Segmentation -- 
   fluidRow(
       column(10, offset = 1, 
           tags$h3("Step 4: Cell Segmentation")
@@ -190,7 +192,7 @@ shinyUI(fluidPage(
       )
   ),
   
-  # -- STEP 5 -- 
+  # -- STEP 5: Cell Feature Expression -- 
   fluidRow(
       column(10, offset = 1, 
           tags$h3("Step 5: Cell Feature Expression")
@@ -247,7 +249,7 @@ shinyUI(fluidPage(
       )
   ),
   
-  # -- STEP 6 -- 
+  # -- STEP 6: Population ID -- 
   fluidRow(
       column(10, offset = 1, 
           tags$h3("Step 6: Population Identification")
@@ -270,6 +272,14 @@ shinyUI(fluidPage(
               ) 
           )
       )
-  )
-    
+  ),
+  
+  # -- STEP 7: Neighborhood ID & Analysis -- 
+  fluidRow(
+      column(10, offset = 1, 
+          tags$h3("Step 7: Neighborhood Identification & Analysis")
+      )
+  ),
+  neighborhood_clickable_ui("neighborhood_clickable")
+
 ))
