@@ -40,10 +40,9 @@ neighborhood_clickable_server <- function(input, output, session,
   
   # plot for first load 
   observeEvent( input$plot_click, {
-    rv$ggClickable <<- ggplot(n_data, aes(x = Global_x, y = Global_y, col = as.factor(pop_ID))) + 
+    rv$ggClickable <<- ggplot(n_data, aes(x = Global_x, y = Global_y)) + 
       coord_fixed() + 
-      geom_point(cex = 2.5) + 
-      scale_color_manual(values = summertime_palette(14)) + 
+      geom_point(cex = 2.5, col = "lightgray") + 
       scale_y_reverse() + 
       theme_clickable() 
   }, ignoreNULL = FALSE, ignoreInit = FALSE, once = TRUE)
