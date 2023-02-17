@@ -1,4 +1,9 @@
 library(ggplot2)
+library(reticulate)
+
+# python setup 
+use_virtualenv("~/.virtualenvs/r-reticulate")
+source_python("www/neighbor_functions.py")
 
 source("www/custom_themes_palettes.R")
 neighborhood_data = read.csv("www/neighborhood_data.csv")
@@ -33,6 +38,8 @@ neighborhood_clickable_ui <- function(id) {
   )
 }
 
+dot_size = 2
+
 neighborhood_clickable_server <- function(input, output, session,
                                           n_data) {
   
@@ -40,23 +47,33 @@ neighborhood_clickable_server <- function(input, output, session,
   
   # plot for first load 
   observeEvent( input$plot_click, {
-    rv$ggClickable <<- ggplot(n_data, aes(x = Global_x, y = Global_y)) + 
+    rv$ggClickable <<- ggplot(n_data) + 
       coord_fixed() + 
-      geom_point(cex = 2.5, col = "lightgray") + 
       scale_y_reverse() + 
+      geom_point(aes(x = Global_x, y = Global_y), cex = dot_size, col = "lightgray") + 
       theme_clickable() 
   }, ignoreNULL = FALSE, ignoreInit = FALSE, once = TRUE)
   
   observe({
     np <- nearPoints(n_data, input$plot_click, maxpoints = 1, addDist = FALSE)
-    str(np)
+    np_coords = as.vector(np[1:2])
+    
+    if (isTruthy(np_coords[["Global_x"]])) { 
+      neighbor_coords = data.frame(t(sapply(find_voronoi(np_coords), c)))
+      np_plotting = data.frame(t(sapply(np_coords, c)))
+      str(np_plotting)
+      
+      rv$ggClickable <<- ggplot(n_data) +
+        coord_fixed() +
+        scale_y_reverse() +
+        geom_point(aes(x = Global_x, y = Global_y), cex = dot_size, col = "lightgray") +
+        geom_point(neighbor_coords, mapping = aes(x = X1, y = X2), cex = dot_size, col = "blue") +
+        geom_point(np_plotting, mapping = aes(x = Global_x, y = Global_y), cex = dot_size, col = "red") + 
+        theme_clickable()
+    } 
     
     # if (nrow(np) <= 0) { 
-    #   rv$ggClickable <<- ggplot(tSNE_plot()) + 
-    #     coord_fixed() +
-    #     geom_point(aes(x = x, y = y, color = fSOM_clusters()), cex = 3) +
-    #     scale_color_manual(values = my_magma()) +
-    #     theme_clickable()
+
     # } else {
     #   rv$ggClickable <<- ggplot(tSNE_plot()) +
     #     coord_fixed() +
@@ -67,6 +84,8 @@ neighborhood_clickable_server <- function(input, output, session,
     #     theme_clickable()
     # }
   })
+  
+
   
   output$neighborhood <- renderPlot({
     rv$ggClickable 

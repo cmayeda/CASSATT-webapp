@@ -49,8 +49,5 @@ shinyServer(function(input, output, session) {
   # -- 7: Neighborhood ID & Analysis -- 
   callModule(neighborhood_clickable_server, "neighborhood_clickable",
              n_data = neighborhood_data)
-  
-  # module to run Python code 
-  callModule(neighborhood_python_server, "neighborhood_py")
 
 })

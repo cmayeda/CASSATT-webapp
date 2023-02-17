@@ -2,11 +2,12 @@
 # created by Cass Mayeda 
 # 11/18/2022 
 
-library(shiny)
-library(shinyjs)
+suppressPackageStartupMessages({
+  library(shiny)
+  library(shinyjs)
+})
 
 source("www/mod_neighborhood_clickable.R")
-source("www/mod_neighborhood_python.R")
 
 shinyUI(fluidPage(
   useShinyjs(),
@@ -25,7 +26,6 @@ shinyUI(fluidPage(
               tags$a(href = "https://cytolab.github.io", "Cytolab Home")
           ), 
           actionButton("hide_help", "Hide help text"),
-          # actionButton("clear_session", "CLEAR SESSION"),
           actionButton("colorblind", "colorblind mode")
       )
   ),
@@ -124,14 +124,14 @@ shinyUI(fluidPage(
                           tags$img(src = "assets/fig2-A-tissue-modified.jpg"),    
                       )
                   ),
-                  # fluidRow(
-                  #     column(6,
-                  #         tags$img(id = "cell-reg-cartoon", src = "assets/fig1-B-cell.jpg") 
-                  #     ),
-                  #     column(6,
-                  #         tags$img(src = "assets/fig3-A-keypoints.jpg")
-                  #     )
-                  # )
+                  fluidRow(
+                      column(6,
+                          tags$img(id = "cell-reg-cartoon", src = "assets/fig1-B-cell.jpg")
+                      ),
+                      column(6,
+                          tags$img(src = "assets/fig3-A-keypoints.jpg")
+                      )
+                  )
               ), 
               column(4,
                   tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 
