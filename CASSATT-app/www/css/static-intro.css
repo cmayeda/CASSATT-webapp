@@ -3,17 +3,27 @@
   margin-left: 0px;
   margin-right: 0px;
 }
-#raw_thumbnails .col-sm-3 {
+#raw_thumbnails .col-sm-3,
+#feature_expr .col-sm-3 {
   padding-left: 0px;
   padding-right: 0px;
 }
 #raw_thumbnails h6 {
   margin-bottom: 3px;
 }
-
 #tissue-reg-cartoon {
   max-width: 68%;
 }
 #cell-reg-cartoon {
   max-width: 80%;
+}
+#tiled img {
+  aspect-ratio: 1/1;
+  max-width: 83%; /* to match tissue detection fig */ 
+}
+#stardist img {
+  max-width: 83%;
+}
+#cluster_legend {
+  max-width: 45%;
 }

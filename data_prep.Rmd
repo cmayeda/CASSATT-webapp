@@ -1,0 +1,21 @@
+---
+title: "data_prep"
+author: "Cass Mayeda"
+date: "2023-02-14"
+---
+
+```{r, read in data }
+# prepare data from CASSATT output for use in Webapp 
+# take neighborhood csvs from Python output/Neighborhood/Neighbor_CSVs
+# export only Global_x, Global_y, and cluster assignment/identity 
+
+setwd(paste0(getwd(), "/data"))
+neighbor_data = do.call(rbind, lapply(list.files(), read.csv))
+```
+
+```{r, subset & export data}
+export_df = neighbor_data[, c("Global_x","Global_y","pop_ID")]
+write.csv(export_df, "CASSATT-app/www/neighborhood_data.csv", row.names = FALSE)
+```
+
+
