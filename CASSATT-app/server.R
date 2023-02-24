@@ -47,7 +47,6 @@ shinyServer(function(input, output, session) {
   output$cluster_legend <- renderImage({ list(src = rv$cluster_legend)}, deleteFile = FALSE)
   
   # -- 7: Neighborhood ID & Analysis -- 
-  callModule(neighborhood_clickable_server, "neighborhood_clickable",
-             n_data = neighborhood_data)
+  callModule(neighborhood_clickable_server, "neighborhood_clickable")
 
 })

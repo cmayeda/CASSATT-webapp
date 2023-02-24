@@ -1,12 +1,23 @@
 library(ggplot2)
 library(reticulate)
 
-# python setup 
-use_virtualenv("~/.virtualenvs/r-reticulate")
-source_python("www/neighbor_functions.py")
+# -- FOR LOCAL
+# use_virtualenv("~/.virtualenvs/r-reticulate")
 
+# -- FOR DEPLOY
+# virtualenv_create("CASSATT-reticulate")
+# py_install("numpy")
+# py_install("pandas")
+# py_install("scipy")
+# py_install("grispy")
+# use_virtualenv("CASSATT-reticulate")
+
+source_python("www/neighbor_functions.py")
 source("www/custom_themes_palettes.R")
+
 neighborhood_data = read.csv("www/neighborhood_data.csv")
+coords = neighborhood_data[, c("Global_x","Global_y")]
+vor = run_voronoi(coords)
 
 neighborhood_clickable_ui <- function(id) {
   ns <- NS(id)
@@ -47,14 +58,14 @@ neighborhood_clickable_ui <- function(id) {
 
 dot_size = 2
 
-neighborhood_clickable_server <- function(input, output, session,
-                                          n_data) {
+neighborhood_clickable_server <- function(input, output, session) {
   
-  rv <- reactiveValues(ggClickable = ggplot())
+  rv <- reactiveValues(ggClickable = ggplot(),
+                       s_neighbors = list())
   
   # plot for first load 
   observeEvent( input$plot_click, {
-    rv$ggClickable <<- ggplot(n_data) + 
+    rv$ggClickable <<- ggplot(coords) + 
       coord_fixed() + 
       scale_y_reverse() + 
       geom_point(aes(x = Global_x, y = Global_y), cex = dot_size, col = "lightgray") + 
@@ -62,22 +73,40 @@ neighborhood_clickable_server <- function(input, output, session,
   }, ignoreNULL = FALSE, ignoreInit = FALSE, once = TRUE)
   
   # color plot based on red clicked cell, and blue neighbor cells 
-  observe({
-    np <- nearPoints(n_data, input$plot_click, maxpoints = 1, addDist = FALSE)
-    np_coords = as.vector(np[1:2])
+  observeEvent( input$plot_click, {
+    np <- nearPoints(coords, input$plot_click, maxpoints = 1, addDist = FALSE)
+    np_coords = array(unlist(np[1:2]))
     
-    if (isTruthy(np_coords[["Global_x"]])) { 
-      neighbor_coords = data.frame(t(sapply(find_voronoi(np_coords), c)))
+    if (isTruthy(np_coords)) {
       np_plotting = data.frame(t(sapply(np_coords, c)))
       
-      rv$ggClickable <<- ggplot(n_data) +
+      if (input$method == "voronoi") {
+        neighbor_coords = as.data.frame(t(sapply(find_voronoi(vor, np_plotting), c)))
+      } else if(input$method == "shell") {
+        # neighbor_coords = find_shell(rv$s_neighbors, np_coords)
+        # str(neighbor_coords)
+      }
+      # else {}
+      
+      rv$ggClickable <<- ggplot(coords) +
         coord_fixed() +
         scale_y_reverse() +
         geom_point(aes(x = Global_x, y = Global_y), cex = dot_size, col = "lightgray") +
-        geom_point(neighbor_coords, mapping = aes(x = X1, y = X2), cex = dot_size, col = "blue") +
-        geom_point(np_plotting, mapping = aes(x = Global_x, y = Global_y), cex = dot_size, col = "red") + 
+        geom_point(neighbor_coords, mapping = aes(x = V1, y = V2), cex = dot_size, col = "blue") +
+        geom_point(np_plotting, mapping = aes(x = X1, y = X2), cex = dot_size, col = "red") +
         theme_clickable()
-    } 
+    }
+  }, ignoreInit = TRUE)
+  
+  # calculate shell neighbors every time distance changes 
+  observeEvent( input$distance, {
+    if (isTruthy(input$distance) & input$method == "shell") {
+      # rv$s_neighbors <<- run_shell(input$distance)
+    }
+  })
+  
+  output$neighborhood <- renderPlot({
+    rv$ggClickable 
   })
   
   # hide and show controls based on neighbor ID method
@@ -92,11 +121,6 @@ neighborhood_clickable_server <- function(input, output, session,
     } else {
       hideElement("distance")
     }
-  })
-
-  
-  output$neighborhood <- renderPlot({
-    rv$ggClickable 
   })
 
 }

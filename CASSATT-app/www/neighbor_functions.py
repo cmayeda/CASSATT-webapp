@@ -1,16 +1,17 @@
 import numpy as np
 import pandas as pd
 from scipy.spatial import Voronoi
+from grispy import GriSPy
 
-n_data = pd.read_csv("www/neighborhood_data.csv")
-coords = np.asarray(n_data[["Global_x","Global_y"]])
-vor = Voronoi(coords)
+def run_voronoi(neighbor_coords):
+  vor = Voronoi(np.asarray(neighbor_coords))
+  return(vor)
 
-def find_voronoi(input_cell):
-  input_cell_array = np.asarray([input_cell.get("Global_x"), input_cell.get("Global_y")], dtype = float)
+def find_voronoi(vor, input_cell):
   
-  input_cell_indx = np.where(vor.points == input_cell_array)[0][0]
-  input_region = vor.regions[vor.point_region[input_cell_indx]] # list of vertices indexes
+  input_x = np.asarray(input_cell.get("X1"))
+  input_cell_indx = np.intersect1d(vor.points[:, 0], input_x, return_indices = True)[1]
+  input_region = vor.regions[int(vor.point_region[input_cell_indx])] # list of vertices indexes
 
   # find regions that share a vertices with input_region
   neighbor_region_indx = []
@@ -27,3 +28,39 @@ def find_voronoi(input_cell):
 
   return(neighbor_points)
 
+# def run_shell(distance):
+#   gsp = GriSPy(coords)
+#   upper_radii = float(distance)
+#   lower_radii = 0.01
+#   shell_dist, shell_ind = gsp.shell_neighbors(
+#       coords,
+#       distance_lower_bound = lower_radii,
+#       distance_upper_bound = upper_radii
+#   )
+# 
+#   # create dict with each list of neighbors as set 
+#   shell_neighbors = {}
+#   for index, v in enumerate(shell_ind):
+#       shell_neighbors[index] = set(v)
+#   
+#   return(shell_neighbors)
+#   exit
+      
+# def find_shell(s_neighbors, input_cell):
+#   
+#   # match input cell x and y to coords
+#   input_cell_indx = np.where(coords == input_cell)[0][0]
+#   
+#   # take indx from coords, use it to find shell dict item 
+#   # neighbors = list(s_neighbors.values())[input_cell_indx]
+#   
+#   return(type(s_neighbors))
+#   
+#   # return neighbors as coordinate pairs
+#   # neighbor_points = []
+#   # for cell_indx in neighbors:
+#   #   neighbor_points.append(coords[cell_indx])
+#   # 
+#   # return(neighbor_points)
+#   exit
+      
