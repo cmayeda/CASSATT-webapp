@@ -39,7 +39,8 @@ neighborhood_clickable_ui <- function(id) {
                            value = 10, min = 5, max = 30),
               numericInput(ns("distance"),
                            label = "Distance in microns",
-                           value = 10, min = 0, max = 50)
+                           value = 10, min = 0, max = 50),
+              actionButton(ns("run_shell"), "Calculate shell neighbors")
               )
             ),
           ),
@@ -85,23 +86,24 @@ neighborhood_clickable_server <- function(input, output, session) {
       } else if(input$method == "shell") {
         # neighbor_coords = find_shell(rv$s_neighbors, np_coords)
         # str(neighbor_coords)
+        cat(paste(find_shell(coords, rv$s_neighbors, np_plotting)), "\n")
       }
       # else {}
       
-      rv$ggClickable <<- ggplot(coords) +
-        coord_fixed() +
-        scale_y_reverse() +
-        geom_point(aes(x = Global_x, y = Global_y), cex = dot_size, col = "lightgray") +
-        geom_point(neighbor_coords, mapping = aes(x = V1, y = V2), cex = dot_size, col = "blue") +
-        geom_point(np_plotting, mapping = aes(x = X1, y = X2), cex = dot_size, col = "red") +
-        theme_clickable()
+      # rv$ggClickable <<- ggplot(coords) +
+      #   coord_fixed() +
+      #   scale_y_reverse() +
+      #   geom_point(aes(x = Global_x, y = Global_y), cex = dot_size, col = "lightgray") +
+      #   geom_point(neighbor_coords, mapping = aes(x = V1, y = V2), cex = dot_size, col = "blue") +
+      #   geom_point(np_plotting, mapping = aes(x = X1, y = X2), cex = dot_size, col = "red") +
+      #   theme_clickable()
     }
   }, ignoreInit = TRUE)
   
-  # calculate shell neighbors every time distance changes 
-  observeEvent( input$distance, {
+  # calculate shell neighbors on btn press  
+  observeEvent( input$run_shell, {
     if (isTruthy(input$distance) & input$method == "shell") {
-      # rv$s_neighbors <<- run_shell(input$distance)
+      rv$s_neighbors <<- run_shell(coords, input$distance)
     }
   })
   
@@ -118,8 +120,10 @@ neighborhood_clickable_server <- function(input, output, session) {
     }
     if (input$method == "shell") {
       showElement("distance")
+      showElement("run_shell")
     } else {
       hideElement("distance")
+      hideElement("run_shell")
     }
   })
 

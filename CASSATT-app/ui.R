@@ -123,14 +123,6 @@ shinyUI(fluidPage(
                       column(6,
                           tags$img(src = "assets/fig2-A-tissue-modified.jpg"),    
                       )
-                  ),
-                  fluidRow(
-                      column(6,
-                          tags$img(id = "cell-reg-cartoon", src = "assets/fig1-B-cell.jpg")
-                      ),
-                      column(6,
-                          tags$img(src = "assets/fig3-A-keypoints.jpg")
-                      )
                   )
               ), 
               column(4,
@@ -168,20 +160,50 @@ shinyUI(fluidPage(
       )
   ),
   
-  # -- STEP 4: Cell Segmentation -- 
+  
+  # -- STEP 4: Cell Registration -- 
   fluidRow(
       column(10, offset = 1, 
-          tags$h3("Step 4: Cell Segmentation")
+          tags$h3("Step 4: Cell Registration")
+      )
+  ),
+  fluidRow(
+      column(10, offset = 1,
+          fluidRow(
+              column(8,
+                  fluidRow(
+                      column(6,
+                          tags$img(id = "cell-reg-cartoon", src = "assets/fig1-B-cell.jpg")
+                      ),
+                      column(6,
+                          tags$img(src = "assets/keypoints.jpg")
+                      )
+                  )
+              ), 
+              column(4,
+                  tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 
+                  mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. Etiam ac turpis bibendum, fermentum 
+                  enim vitae, feugiat nulla. Morbi pharetra euismod dictum. Class aptent taciti sociosqu ad litora torquent per 
+                  conubia nostra, per inceptos himenaeos.")
+              )
+          )
+      )
+  ),
+  
+  # -- STEP 5: Cell Segmentation -- 
+  fluidRow(
+      column(10, offset = 1, 
+          tags$h3("Step 5: Cell Segmentation")
       )
   ),
   fluidRow(
       column(10, offset = 1,
          fluidRow(
-            column(4,
-                tags$img(src = "assets/fig1-C-segmentation.jpg")
-            ),
             column(4, id = "stardist",
                 tags$img(src = "assets/stardist_mask.jpg")
+            ),
+            column(4, 
+                tags$img(src = "assets/cell_segmentation.jpg")
             ),
             column(4,
                 tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 
@@ -193,10 +215,10 @@ shinyUI(fluidPage(
       )
   ),
   
-  # -- STEP 5: Cell Feature Expression -- 
+  # -- STEP 6: Cell Feature Expression -- 
   fluidRow(
       column(10, offset = 1, 
-          tags$h3("Step 5: Cell Feature Expression")
+          tags$h3("Step 6: Cell Feature Expression")
       )
   ),
   fluidRow(
@@ -250,10 +272,10 @@ shinyUI(fluidPage(
       )
   ),
   
-  # -- STEP 6: Population ID -- 
+  # -- STEP 7: Population ID -- 
   fluidRow(
       column(10, offset = 1, 
-          tags$h3("Step 6: Population Identification")
+          tags$h3("Step 7: Population Identification")
       )
   ),
   fluidRow(
@@ -275,10 +297,10 @@ shinyUI(fluidPage(
       )
   ),
   
-  # -- STEP 7: Neighborhood ID & Analysis -- 
+  # -- STEP 8: Neighborhood ID & Analysis -- 
   fluidRow(
       column(10, offset = 1, 
-          tags$h3("Step 7: Neighborhood Identification & Analysis")
+          tags$h3("Step 8: Neighborhood Identification & Analysis")
       )
   ),
   neighborhood_clickable_ui("neighborhood_clickable")
