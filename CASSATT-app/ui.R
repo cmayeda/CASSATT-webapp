@@ -45,6 +45,22 @@ shinyUI(fluidPage(
           egestas non turpis ut, ornare dapibus tortor.")
       )
   ),
+  fluidRow(
+      column(10, offset = 1,
+          tags$h3("Whole slide and tile optimization"),
+          fluidRow(
+              column(6, 
+                  tags$img(src = "assets/whole_slide.jpg")
+              ),
+              column(6,
+                  tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 
+                  mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. Etiam ac turpis bibendum, fermentum 
+                  enim vitae, feugiat nulla. Morbi pharetra euismod dictum. Class aptent taciti sociosqu ad litora torquent per 
+                  conubia nostra, per inceptos himenaeos.") 
+              )
+          )
+      )
+  ), 
   
   # -- STEP 1: Data Collection -- 
   fluidRow(
@@ -199,10 +215,10 @@ shinyUI(fluidPage(
   fluidRow(
       column(10, offset = 1,
          fluidRow(
-            column(4, id = "stardist",
+            column(4, class = "stardist",
                 tags$img(src = "assets/stardist_mask.jpg")
             ),
-            column(4, 
+            column(4, class = "stardist",
                 tags$img(src = "assets/cell_segmentation.jpg")
             ),
             column(4,
