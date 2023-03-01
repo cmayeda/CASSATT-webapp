@@ -41,10 +41,9 @@ def run_shell(neighbor_coords, distance):
   # create dict with each list of neighbors as set
   shell_neighbors = {}
   for index, v in enumerate(shell_ind):
-      shell_neighbors[index] = set(v)
+      shell_neighbors[index] = list(v)
 
   return(shell_neighbors)
-
       
 def find_shell(neighbor_coords, s_neighbors, input_cell):
 
@@ -53,13 +52,14 @@ def find_shell(neighbor_coords, s_neighbors, input_cell):
   input_cell_indx = np.intersect1d(np.asarray(neighbor_coords)[:, 0], input_x, return_indices = True)[1]
 
   # take indx from coords, use it to find shell dict item
-  neighbors = s_neighbors[str(input_cell_indx)]
-  return(type(neighbors))
+  s_list = list(s_neighbors.values())
+  neighbors = s_list[int(input_cell_indx)]
 
-#   # return neighbors as coordinate pairs
-#   # neighbor_points = []
-#   # for cell_indx in neighbors:
-#   #   neighbor_points.append(coords[cell_indx])
-#   # 
-#   # return(neighbor_points)
-      
+  if len(neighbors) > 0:
+    
+    # return neighbors as coordinate pairs
+    neighbor_points = []
+    for cell_indx in neighbors:
+      neighbor_points.append(neighbor_coords.iloc[int(cell_indx)])
+
+    return(neighbor_points)

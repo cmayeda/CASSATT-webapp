@@ -38,8 +38,8 @@ neighborhood_clickable_ui <- function(id) {
                            label = "Number of nearest neighbors",
                            value = 10, min = 5, max = 30),
               numericInput(ns("distance"),
-                           label = "Distance in microns",
-                           value = 10, min = 0, max = 50),
+                           label = "Distance in pixels",
+                           value = 70, min = 0, max = 300),
               actionButton(ns("run_shell"), "Calculate shell neighbors")
               )
             ),
@@ -84,19 +84,28 @@ neighborhood_clickable_server <- function(input, output, session) {
       if (input$method == "voronoi") {
         neighbor_coords = as.data.frame(t(sapply(find_voronoi(vor, np_plotting), c)))
       } else if(input$method == "shell") {
-        # neighbor_coords = find_shell(rv$s_neighbors, np_coords)
-        # str(neighbor_coords)
-        cat(paste(find_shell(coords, rv$s_neighbors, np_plotting)), "\n")
+        neighbor_coords = as.data.frame(t(sapply(find_shell(coords, rv$s_neighbors, np_plotting), c)))
       }
       # else {}
-      
-      # rv$ggClickable <<- ggplot(coords) +
-      #   coord_fixed() +
-      #   scale_y_reverse() +
-      #   geom_point(aes(x = Global_x, y = Global_y), cex = dot_size, col = "lightgray") +
-      #   geom_point(neighbor_coords, mapping = aes(x = V1, y = V2), cex = dot_size, col = "blue") +
-      #   geom_point(np_plotting, mapping = aes(x = X1, y = X2), cex = dot_size, col = "red") +
-      #   theme_clickable()
+
+      if (ncol(neighbor_coords) > 0) {
+        colnames(neighbor_coords) <- c("V1","V2")
+        rv$ggClickable <<- ggplot(coords) +
+          coord_fixed() +
+          scale_y_reverse() +
+          geom_point(aes(x = Global_x, y = Global_y), cex = dot_size, col = "lightgray") +
+          geom_point(neighbor_coords, mapping = aes(x = V1, y = V2), cex = dot_size, col = "blue") +
+          geom_point(np_plotting, mapping = aes(x = X1, y = X2), cex = dot_size, col = "red") +
+          theme_clickable()
+      } else {
+        rv$ggClickable <<- ggplot(coords) +
+          coord_fixed() +
+          scale_y_reverse() +
+          geom_point(aes(x = Global_x, y = Global_y), cex = dot_size, col = "lightgray") +
+          geom_point(np_plotting, mapping = aes(x = X1, y = X2), cex = dot_size, col = "red") +
+          theme_clickable()
+      }
+
     }
   }, ignoreInit = TRUE)
   
