@@ -109,6 +109,11 @@ neighborhood_clickable_server <- function(input, output, session) {
     }
   }, ignoreInit = TRUE)
   
+  # run shell once on load 
+  observeEvent( input$run_shell, {
+    rv$s_neighbors <<- run_shell(coords, input$distance)
+  }, ignoreNULL = FALSE, ignoreInit = FALSE, once = TRUE)
+  
   # calculate shell neighbors on btn press  
   observeEvent( input$run_shell, {
     if (isTruthy(input$distance) & input$method == "shell") {
@@ -134,6 +139,13 @@ neighborhood_clickable_server <- function(input, output, session) {
       hideElement("distance")
       hideElement("run_shell")
     }
+    
+    # wipe plot on method change 
+    rv$ggClickable <<- ggplot(coords) +
+      coord_fixed() +
+      scale_y_reverse() +
+      geom_point(aes(x = Global_x, y = Global_y), cex = dot_size, col = "lightgray") +
+      theme_clickable()
   })
 
 }
