@@ -40,6 +40,7 @@ neighborhood_clickable_ui <- function(id) {
               numericInput(ns("distance"),
                            label = "Distance in pixels",
                            value = 70, min = 0, max = 300),
+              tags$div(id = "shell_warning", class = "warning"), 
               actionButton(ns("run_shell"), "Calculate shell neighbors")
               )
             ),
@@ -84,7 +85,18 @@ neighborhood_clickable_server <- function(input, output, session) {
       if (input$method == "voronoi") {
         neighbor_coords = as.data.frame(t(sapply(find_voronoi(vor, np_plotting), c)))
       } else if(input$method == "shell") {
-        neighbor_coords = as.data.frame(t(sapply(find_shell(coords, rv$s_neighbors, np_plotting), c)))
+        if (BOOL_SHELL == TRUE) {
+          neighbor_coords <<- as.data.frame(x = c(NULL), y = c(NULL))
+          if (SHELL_WPRESENT == FALSE) {
+            insertUI(
+              selector = "#shell_warning", 
+              ui = tags$h5(id = "s_warning", "Warning: shell neighbors has not been run for this distance")
+            )
+            SHELL_WPRESENT <<- TRUE
+          }
+        } else {
+          neighbor_coords = as.data.frame(t(sapply(find_shell(coords, rv$s_neighbors, np_plotting), c)))
+        }
       }
       # else {}
 
@@ -108,6 +120,9 @@ neighborhood_clickable_server <- function(input, output, session) {
 
     }
   }, ignoreInit = TRUE)
+
+  BOOL_SHELL = FALSE
+  SHELL_WPRESENT = FALSE 
   
   # run shell once on load 
   observeEvent( input$run_shell, {
@@ -117,9 +132,19 @@ neighborhood_clickable_server <- function(input, output, session) {
   # calculate shell neighbors on btn press  
   observeEvent( input$run_shell, {
     if (isTruthy(input$distance) & input$method == "shell") {
+      BOOL_SHELL <<- FALSE
       rv$s_neighbors <<- run_shell(coords, input$distance)
+
+      if (SHELL_WPRESENT == TRUE) {
+        removeUI(selector = "#s_warning", immediate = TRUE)
+        SHELL_WPRESENT <<- FALSE
+      }
     }
   })
+  
+  observeEvent( input$distance, {
+    BOOL_SHELL <<- TRUE
+  }, ignoreInit = TRUE)
   
   output$neighborhood <- renderPlot({
     rv$ggClickable 
