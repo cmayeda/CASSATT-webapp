@@ -41,7 +41,9 @@ neighborhood_clickable_ui <- function(id) {
                            label = "Distance in pixels",
                            value = 70, min = 0, max = 300),
               tags$div(id = "shell_warning", class = "warning"), 
-              actionButton(ns("run_shell"), "Calculate shell neighbors")
+              actionButton(ns("run_shell"), "Calculate shell neighbors"),
+              tags$div(id = "knn_warning", class = "warning"), 
+              actionButton(ns("run_knn"), "Calculate nearest neighbors"),
               )
             ),
           ),
@@ -97,8 +99,20 @@ neighborhood_clickable_server <- function(input, output, session) {
         } else {
           neighbor_coords = as.data.frame(t(sapply(find_shell(coords, rv$s_neighbors, np_plotting), c)))
         }
+      } else {
+        if (BOOL_KNN == TRUE) {
+          neighbor_coords <<- as.data.frame(x = c(NULL), y = c(NULL))
+          if (KNN_WPRESENT == FALSE) {
+            insertUI(
+              selector = "#knn_warning", 
+              ui = tags$h5(id = "k_warning", "Warning: knn neighbors has not been run for this k value")
+            )
+            KNN_WPRESENT <<- TRUE
+          }
+        } else {
+          neighbor_coords = as.data.frame(t(sapply(find_knn(coords, rv$knn_neighbors, np_plotting), c)))
+        }
       }
-      # else {}
 
       if (ncol(neighbor_coords) > 0) {
         colnames(neighbor_coords) <- c("V1","V2")
@@ -121,12 +135,14 @@ neighborhood_clickable_server <- function(input, output, session) {
     }
   }, ignoreInit = TRUE)
 
-  BOOL_SHELL = FALSE
-  SHELL_WPRESENT = FALSE 
+  output$neighborhood <- renderPlot({
+    rv$ggClickable 
+  })
   
-  # run shell once on load 
+  # run shell & knn once on load 
   observeEvent( input$run_shell, {
     rv$s_neighbors <<- run_shell(coords, input$distance)
+    rv$knn_neighbors <<- run_knn(coords, input$n_neighbors)
   }, ignoreNULL = FALSE, ignoreInit = FALSE, once = TRUE)
   
   # calculate shell neighbors on btn press  
@@ -134,7 +150,6 @@ neighborhood_clickable_server <- function(input, output, session) {
     if (isTruthy(input$distance) & input$method == "shell") {
       BOOL_SHELL <<- FALSE
       rv$s_neighbors <<- run_shell(coords, input$distance)
-
       if (SHELL_WPRESENT == TRUE) {
         removeUI(selector = "#s_warning", immediate = TRUE)
         SHELL_WPRESENT <<- FALSE
@@ -142,20 +157,39 @@ neighborhood_clickable_server <- function(input, output, session) {
     }
   })
   
+  # calculate knn neighbors on btn press 
+  observeEvent( input$run_knn, {
+    if (isTruthy(input$n_neighbors) & input$method == "knn") {
+      BOOL_KNN <<- FALSE 
+      rv$knn_neighbors <<- run_knn(coords, input$n_neighbors)
+      if (KNN_WPRESENT == TRUE) {
+        removeUI(selector = "#k_warning", immediate = TRUE)
+        KNN_WPRESENT <<- FALSE 
+      }
+    }
+  }, ignoreInit = TRUE)
+  
+  # reactive warnings 
+  BOOL_SHELL = FALSE
+  SHELL_WPRESENT = FALSE 
+  BOOL_KNN = FALSE 
+  KNN_WPRESENT = FALSE
+  
   observeEvent( input$distance, {
     BOOL_SHELL <<- TRUE
   }, ignoreInit = TRUE)
-  
-  output$neighborhood <- renderPlot({
-    rv$ggClickable 
-  })
+  observeEvent( input$n_neighbors, {
+    BOOL_KNN <<- TRUE
+  }, ignoreInit = TRUE)
   
   # hide and show controls based on neighbor ID method
   observe({
     if (input$method == "knn") {
       showElement("n_neighbors")
+      showElement("run_knn")
     } else {
       hideElement("n_neighbors")
+      hideElement("run_knn")
     }
     if (input$method == "shell") {
       showElement("distance")

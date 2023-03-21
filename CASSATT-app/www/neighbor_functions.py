@@ -63,3 +63,37 @@ def find_shell(neighbor_coords, s_neighbors, input_cell):
       neighbor_points.append(neighbor_coords.iloc[int(cell_indx)])
 
     return(neighbor_points)
+  
+def run_knn(neighbor_coords, n_neighbors):
+  n_coords_array = np.asarray(neighbor_coords)
+  gsp = GriSPy(n_coords_array)
+  knn_dist, knn_ind = gsp.nearest_neighbors(
+      n_coords_array,
+      n = int(n_neighbors)
+  )
+  knn_neighbors = {}
+  count = 0
+  for index, v in enumerate(knn_ind):
+      knn_neighbors[index] = set(v)
+      count += len(v)
+      
+  return(knn_neighbors)
+
+def find_knn(neighbor_coords, knn_neighbors, input_cell):
+
+  # match input cell x and y to coords
+  input_x = np.asarray(input_cell.get("X1"))
+  input_cell_indx = np.intersect1d(np.asarray(neighbor_coords)[:, 0], input_x, return_indices = True)[1]
+
+  # take indx from coords, use it to find shell dict item
+  knn_list = list(knn_neighbors.values())
+  neighbors = knn_list[int(input_cell_indx)]
+
+  if len(neighbors) > 0:
+    
+    # return neighbors as coordinate pairs
+    neighbor_points = []
+    for cell_indx in neighbors:
+      neighbor_points.append(neighbor_coords.iloc[int(cell_indx)])
+
+    return(neighbor_points)
