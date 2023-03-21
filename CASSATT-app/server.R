@@ -35,8 +35,8 @@ shinyServer(function(input, output, session) {
   # -- 5: Cell Feature Expression -- 
   output$expr_CD3 <- renderImage({ list(src = rv$expr_img_list[1]) }, deleteFile = FALSE)
   output$expr_CD4 <- renderImage({ list(src = rv$expr_img_list[2]) }, deleteFile = FALSE)
-  output$expr_CD8 <- renderImage({ list(src = rv$expr_img_list[3]) }, deleteFile = FALSE)
-  output$expr_CD68 <- renderImage({ list(src = rv$expr_img_list[4]) }, deleteFile = FALSE)
+  output$expr_CD8 <- renderImage({ list(src = rv$expr_img_list[4]) }, deleteFile = FALSE)
+  output$expr_CD68 <- renderImage({ list(src = rv$expr_img_list[3]) }, deleteFile = FALSE)
   output$expr_FoxP3 <- renderImage({ list(src = rv$expr_img_list[5]) }, deleteFile = FALSE)
   output$expr_Iba1 <- renderImage({ list(src = rv$expr_img_list[6]) }, deleteFile = FALSE)
   output$expr_PD <- renderImage({ list(src = rv$expr_img_list[7]) }, deleteFile = FALSE)
@@ -47,7 +47,6 @@ shinyServer(function(input, output, session) {
   output$cluster_legend <- renderImage({ list(src = rv$cluster_legend)}, deleteFile = FALSE)
   
   # -- 7: Neighborhood ID & Analysis -- 
-  callModule(neighborhood_clickable_server, "neighborhood_clickable",
-             n_data = neighborhood_data)
+  callModule(neighborhood_clickable_server, "neighborhood_clickable")
 
 })

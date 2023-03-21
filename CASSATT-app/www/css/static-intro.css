@@ -11,6 +11,9 @@
 #raw_thumbnails h6 {
   margin-bottom: 3px;
 }
+#feature_expr .row {
+  padding-left: 15px; 
+}
 #tissue-reg-cartoon {
   max-width: 68%;
 }
@@ -21,9 +24,9 @@
   aspect-ratio: 1/1;
   max-width: 83%; /* to match tissue detection fig */ 
 }
-#stardist img {
+.stardist img {
   max-width: 83%;
 }
 #cluster_legend {
-  max-width: 45%;
+  max-width: 80%;
 }

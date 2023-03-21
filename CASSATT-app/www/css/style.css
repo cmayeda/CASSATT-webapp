@@ -28,6 +28,16 @@ img {
 h3 {
   margin-bottom: 20px;
 }
+.warning {
+  color: red;
+  font-family: "Roboto";
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.warning h5 {
+  font-weight: 300;
+  font-size: 14px;
+}
 
 /* -- NAVBAR -- */ 
 #navbar {
