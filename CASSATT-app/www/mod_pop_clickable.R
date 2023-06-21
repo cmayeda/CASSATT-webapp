@@ -49,26 +49,14 @@ dot_size = 2
 pop_clickable_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     
-    rv <- reactiveValues(gir = ggplot(),
-                         g.ratio = 1,
-                         current_pop = NULL)
-    
-    gir_options = list(
-      opts_toolbar(saveaspng = FALSE),
-      opts_hover(css = "stroke:#cece5b2; stroke-width:1px;"),
-      opts_hover_key(css = "stroke:#cece5b2; stroke-width:1px;"),
-      opts_selection(css = "stroke:#000000; stroke-width:1px;", type = "single"),
-      opts_selection_key(css = "stroke:#000000; stroke-width:1px;", type = "single")
-    )
-    
-    # initial load 
-    observeEvent( input$method, {
-      range <- apply(apply(neighborhood_data[, c("Global_x","Global_y")], 2, range), 2, diff)
-      rv$g.ratio <<- (range[1] / range[2])
+    rv <- reactiveValues(current_pop = NULL,
+                         ordered_data = neighborhood_data)
 
-      gg = ggplot(neighborhood_data) +
+    # create interactive plot and legend 
+    gir <- reactive({
+      ggplot(rv$ordered_data) +
         geom_point_interactive(aes(
-          x = Global_x, y = Global_y, 
+          x = Global_x, y = Global_y,
           col = pop_ID, tooltip = pop_ID, data_id = pop_ID
         ), cex = dot_size) +
         scale_color_manual_interactive(
@@ -76,63 +64,20 @@ pop_clickable_server <- function(id) {
           values = summertime_pal,
           breaks = names(summertime_pal),
           data_id = function(breaks) { breaks },
-          labels = function(breaks) { lapply(breaks, function(br) { 
+          labels = function(breaks) { lapply(breaks, function(br) {
             label_interactive(br, data_id = br)
           })}
         ) +
-        coord_fixed(ratio = rv$g.ratio) +
+        coord_fixed() +
         scale_y_reverse() +
         theme_clickable()
-
-      rv$gir <<- girafe(ggobj = gg, options = gir_options)
-    }, ignoreInit = FALSE, once = TRUE)
-  
-    # bring forward population on plot click  
+    })
+    
+    # place clicked population on top   
     observeEvent( rv$current_pop, {
-      pop_data = neighborhood_data[which(neighborhood_data$pop_ID == rv$current_pop), ]
-      gg = ggplot(neighborhood_data) +
-        geom_point_interactive(aes(
-          x = Global_x, y = Global_y,
-          col = pop_ID, tooltip = pop_ID, data_id = pop_ID
-        ), cex = dot_size) +
-        geom_point_interactive(data = pop_data, aes(
-          x = Global_x, y = Global_y,
-          col = pop_ID, tooltip = pop_ID, data_id = pop_ID
-        ), cex = dot_size) +
-        scale_color_manual_interactive(
-          name = "Population",
-          values = summertime_pal,
-          breaks = names(summertime_pal),
-          data_id = function(breaks) { breaks },
-          labels = function(breaks) { lapply(breaks, function(br) { 
-            label_interactive(br, data_id = br)
-          })}
-        ) +
-        coord_fixed(ratio = rv$g.ratio) +
-        scale_y_reverse() +
-        theme_clickable()
-
-      rv$gir <<- girafe(ggobj = gg, options = gir_options)
-      
-      
-    #   np <- nearPoints(coords, input$plot_click, maxpoints = 1, addDist = FALSE)
-    # 
-    #   if (isTruthy(np)) {
-    #     point_data = subset(neighborhood_data, Global_x == np$Global_x & Global_y == np$Global_y)
-    #     
-    #     
-    #     if (input$method == "expert gating") {
-    #       pop_data = neighborhood_data[which(neighborhood_data$pop_ID == point_data$pop_ID), ]
-    #     }
-    # 
-    #     rv$gg <<- ggplot(neighborhood_data) +
-    #       geom_point(aes(x = Global_x, y = Global_y, col = pop_ID), cex = dot_size) + 
-    #       geom_point(pop_data, mapping = aes(x = Global_x, y = Global_y), cex = dot_size, col = "black") +
-    #       scale_color_manual(values = summertime_pal_faded, breaks = names(summertime_pal_faded)) + 
-    #       coord_fixed() +
-    #       scale_y_reverse() +
-    #       theme_clickable()
-    #   }
+      indxs = which(neighborhood_data$pop_ID == rv$current_pop)
+      step = neighborhood_data[-indxs, ]
+      rv$ordered_data <<- rbind(step, neighborhood_data[indxs, ])
     }, ignoreInit = TRUE, ignoreNULL = TRUE)
     
     # set plot to match legend click 
@@ -157,48 +102,17 @@ pop_clickable_server <- function(id) {
       }
     }, ignoreInit = TRUE, ignoreNULL = FALSE)
     
+    gir_options = list(
+      opts_toolbar(saveaspng = FALSE),
+      opts_hover(css = "stroke:#cece5b2; stroke-width:1px;"),
+      opts_hover_key(css = "stroke:#cece5b2; stroke-width:1px;"),
+      opts_selection(css = "stroke:#000000; stroke-width:1px;", type = "single"),
+      opts_selection_key(css = "stroke:#000000; stroke-width:1px;", type = "single")
+    )
+    
     output$plot <- renderGirafe({
-      rv$gir
+      girafe(ggobj = gir(), options = gir_options)
     })
-  
-    # reactive warnings 
-    # BOOL_SHELL = FALSE
-    # SHELL_WPRESENT = FALSE 
-    # BOOL_KNN = FALSE 
-    # KNN_WPRESENT = FALSE
-    # 
-    # observeEvent( input$distance, {
-    #   BOOL_SHELL <<- TRUE
-    # }, ignoreInit = TRUE)
-    # observeEvent( input$n_neighbors, {
-    #   BOOL_KNN <<- TRUE
-    # }, ignoreInit = TRUE)
-    
-    # hide and show controls based on neighbor ID method
-    # observe({
-    #   if (input$method == "knn") {
-    #     showElement("n_neighbors")
-    #     showElement("run_knn")
-    #   } else {
-    #     hideElement("n_neighbors")
-    #     hideElement("run_knn")
-    #   }
-    #   if (input$method == "shell") {
-    #     showElement("distance")
-    #     showElement("run_shell")
-    #   } else {
-    #     hideElement("distance")
-    #     hideElement("run_shell")
-    #   }
-    #   
-    #   # wipe plot on method change 
-    #   rv$ggClickable <<- ggplot(coords) +
-    #     coord_fixed() +
-    #     scale_y_reverse() +
-    #     geom_point(aes(x = Global_x, y = Global_y), cex = dot_size, col = "lightgray") +
-    #     theme_clickable()
-    # })
-    
   })
 }
 
