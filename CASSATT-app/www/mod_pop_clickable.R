@@ -101,18 +101,28 @@ pop_clickable_server <- function(id) {
     selected = NULL
     
     observeEvent( input$plot_key_selected, {
-      selected <<- input$plot_key_selected
-      indxs = which(neighborhood_data$pop_ID == input$plot_key_selected)
-      step = neighborhood_data[-indxs, ]
-      rv$ordered_data <<- rbind(step, neighborhood_data[indxs, ])
-    }, ignoreInit = TRUE)
+      if (!is.null(input$plot_key_selected)) {
+        selected <<- input$plot_key_selected
+        indxs = which(neighborhood_data$pop_ID == input$plot_key_selected)
+        step = neighborhood_data[-indxs, ]
+        rv$ordered_data <<- rbind(step, neighborhood_data[indxs, ])
+      } else {
+        selected <<- character(0)
+        rv$ordered_data <<- neighborhood_data
+      }
+    }, ignoreInit = TRUE, ignoreNULL = FALSE)
     
     observeEvent( input$plot_selected, {
-      selected <<- input$plot_selected
-      indxs = which(neighborhood_data$pop_ID == input$plot_selected)
-      step = neighborhood_data[-indxs, ]
-      rv$ordered_data <<- rbind(step, neighborhood_data[indxs, ])
-    }, ignoreInit = TRUE)
+      if (!is.null(input$plot_selected)) {
+        selected <<- input$plot_selected
+        indxs = which(neighborhood_data$pop_ID == input$plot_selected)
+        step = neighborhood_data[-indxs, ]
+        rv$ordered_data <<- rbind(step, neighborhood_data[indxs, ])
+      } else {
+        selected <<- character(0)
+        rv$ordered_data <<- neighborhood_data
+      }
+    }, ignoreInit = TRUE, ignoreNULL = FALSE)
     
     # after reordering plot, re-select clicked population 
     session$onFlushed(function() {
