@@ -49,24 +49,33 @@ dot_size = 2
 pop_clickable_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     
-    rv <- reactiveValues(current_pop = NULL,
-                         ordered_data = neighborhood_data,
-                         gir = NULL)
+    rv <- reactiveValues(ordered_data = neighborhood_data)
 
+    outline_click = "#e3d2c3"
+    outline_hover = "#a79484"
+    text_click = "#000000"
+    text_hover = "#515151"
+    
     gir_options = list(
       opts_toolbar(saveaspng = FALSE),
-      opts_hover(css = "stroke:#cece5b2; stroke-width:1px;"),
-      opts_hover_key(css = "stroke:#cece5b2; stroke-width:1px;"),
-      opts_selection(css = "stroke:#000000; stroke-width:1px;", type = "single"),
-      opts_selection_key(css = "stroke:#000000; stroke-width:1px;", type = "single")
+      opts_hover(css = paste0("stroke:",outline_hover,"; stroke-width:1.6px;")),
+      opts_hover_key(css = girafe_css(
+        css = paste0("stroke:",outline_hover,"; stroke-width:1.6px;"),
+        text = paste0("stroke:",text_hover,"; stroke-width:0.4px;")
+      )),
+      opts_selection(css = paste0("stroke:",outline_click,"; stroke-width:1.6px;"), type = "single"),
+      opts_selection_key(css = girafe_css(
+        css = paste0("stroke:",outline_click,"; stroke-width:1.6px"),
+        text = paste0("stroke-width:0.4px; stroke:",text_click,";")
+      ), type = "single")
     )
     
-    # set initial plot data order 
+    # initial plot data order 
     observeEvent( input$plot_selected, {
       rv$ordered_data <<- neighborhood_data
     }, ignoreInit = FALSE, ignoreNULL = FALSE, once = TRUE)
     
-    # set up interactive plot and legend 
+    # interactive plot and legend 
     output$plot <- renderGirafe({ 
       gg = ggplot(rv$ordered_data) +
         geom_point_interactive(aes(
