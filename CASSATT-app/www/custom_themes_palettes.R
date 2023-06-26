@@ -38,6 +38,9 @@ summertime_expanded = c(
   "#354953","#1d2b22",
   "#d06a24","#9e4200"
 )
+set.seed(3)
+summertime_expanded <- sample(summertime_expanded)
+names(summertime_expanded) <- as.character(1:15)
 
 
 
