@@ -8,6 +8,7 @@ suppressPackageStartupMessages({
 })
 
 source("www/mod_neighborhood_clickable.R")
+source("www/mod_pop_clickable.R")
 
 shinyUI(fluidPage(
   useShinyjs(),
@@ -294,24 +295,7 @@ shinyUI(fluidPage(
           tags$h3("Step 7: Population Identification")
       )
   ),
-  fluidRow(
-      column(10, offset = 1, 
-          fluidRow(
-              column(4,
-                  plotOutput("cluster_plot", height = "100%")
-              ),
-              column(2, 
-                  plotOutput("cluster_legend", height = "100%")
-              ),
-              column(4, offset = 2, 
-                  tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 
-                  mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. Etiam ac turpis bibendum, fermentum 
-                  enim vitae, feugiat nulla. Morbi pharetra euismod dictum. Class aptent taciti sociosqu ad litora torquent per 
-                  conubia nostra, per inceptos himenaeos.")
-              ) 
-          )
-      )
-  ),
+  pop_clickable_ui("pop_clickable"), 
   
   # -- STEP 8: Neighborhood ID & Analysis -- 
   fluidRow(

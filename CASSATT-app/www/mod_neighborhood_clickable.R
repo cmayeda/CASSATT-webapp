@@ -25,7 +25,7 @@ neighborhood_clickable_ui <- function(id) {
     fluidRow(
       column(10, offset = 1,
         fluidRow(
-          column(6,
+          column(5,
             plotOutput(ns("neighborhood"), click = ns("plot_click"), height = "600px")
           ),
           column(6, 
