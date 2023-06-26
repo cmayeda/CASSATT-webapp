@@ -1,6 +1,3 @@
-library(ggplot2)
-library(reticulate)
-
 # -- FOR LOCAL
 # use_virtualenv("~/.virtualenvs/r-reticulate")
 

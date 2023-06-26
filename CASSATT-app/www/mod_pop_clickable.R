@@ -1,23 +1,3 @@
-library(ggplot2)
-library(reticulate)
-library(ggiraph)
-
-# -- FOR LOCAL
-# use_virtualenv("~/.virtualenvs/r-reticulate")
-
-# -- FOR DEPLOY
-# virtualenv_create("CASSATT-reticulate")
-# py_install("numpy")
-# py_install("pandas")
-# py_install("scipy")
-# py_install("grispy")
-# use_virtualenv("CASSATT-reticulate")
-
-source("www/custom_themes_palettes.R")
-
-neighborhood_data = read.csv("www/neighborhood_data.csv")
-neighborhood_data$kmeans_cluster <- as.factor(neighborhood_data$kmeans_cluster)
-
 pop_clickable_ui <- function(id) {
   ns <- NS(id)
   tagList(
