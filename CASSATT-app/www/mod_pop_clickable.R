@@ -119,24 +119,22 @@ pop_clickable_server <- function(id) {
     observeEvent( input$plot_key_selected, {
       if (!is.null(input$plot_key_selected)) {
         selected <<- input$plot_key_selected
-        indxs = which(neighborhood_data[, rv$col] == selected)
-        step = neighborhood_data[-indxs, ]
-        rv$ordered_data <<- rbind(step, neighborhood_data[indxs, ])
+        indxs = which(rv$ordered_data[, rv$col] == selected)
+        step = rv$ordered_data[-indxs, ]
+        rv$ordered_data <<- rbind(step, rv$ordered_data[indxs, ])
       } else {
         selected <<- character(0)
-        rv$ordered_data <<- neighborhood_data
       }
     }, ignoreInit = TRUE, ignoreNULL = FALSE)
     
     observeEvent( input$plot_selected, {
       if (!is.null(input$plot_selected)) {
         selected <<- input$plot_selected
-        indxs = which(neighborhood_data[, rv$col] == selected)
-        step = neighborhood_data[-indxs, ]
-        rv$ordered_data <<- rbind(step, neighborhood_data[indxs, ])
+        indxs = which(rv$ordered_data[, rv$col] == selected)
+        step = rv$ordered_data[-indxs, ]
+        rv$ordered_data <<- rbind(step, rv$ordered_data[indxs, ])
       } else {
         selected <<- character(0)
-        rv$ordered_data <<- neighborhood_data
       }
     }, ignoreInit = TRUE, ignoreNULL = FALSE)
     
