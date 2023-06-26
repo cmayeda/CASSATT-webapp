@@ -42,7 +42,14 @@ set.seed(3)
 summertime_expanded <- sample(summertime_expanded)
 names(summertime_expanded) <- as.character(0:14)
 
+# Viridis palette for Step 7 
+library(viridisLite)
+set.seed(5)
+viridis_expert = sample(viridis(13))
+names(viridis_expert) <- names(summertime_pal)
 
+viridis_kmeans = sample(viridis(15))
+names(viridis_kmeans) <- as.character(0:14)
 
 
 

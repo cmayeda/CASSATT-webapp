@@ -66,7 +66,7 @@ gir_options = list(
   ), type = "single")
 )
 
-pop_clickable_server <- function(id) {
+pop_clickable_server <- function(id, server_rv) {
   moduleServer(id, function(input, output, session) {
     
     rv <- reactiveValues(ordered_data = neighborhood_data,
@@ -79,15 +79,23 @@ pop_clickable_server <- function(id) {
       rv$ordered_data <<- neighborhood_data
     }, ignoreInit = FALSE, ignoreNULL = FALSE, once = TRUE)
     
-    # toggle method types 
-    observeEvent( input$method, {
+    # toggle method types & colormode
+    observeEvent( c(input$method, server_rv$colormode), {
       if(input$method == "kmeans clustering") { 
         rv$col <<- "kmeans_cluster"
-        rv$pal <<- summertime_expanded
+        if (server_rv$colormode == "custom") { 
+          rv$pal <<- summertime_expanded
+        } else {
+          rv$pal <<- viridis_kmeans
+        }
         rv$breaks <<- as.character(0:15)
       } else {
         rv$col <<- "pop_ID"
-        rv$pal <<- summertime_pal
+        if (server_rv$colormode == "custom") { 
+          rv$pal <<- summertime_pal
+        } else {
+          rv$pal <<- viridis_expert
+        }
         rv$breaks <<- names(summertime_pal)
       }
     }, ignoreInit = TRUE)
@@ -95,7 +103,7 @@ pop_clickable_server <- function(id) {
     # interactive plot and legend 
     output$plot <- renderGirafe({ 
       
-      # delay updating plot until breaks have been updated 
+      # delay updating plot until break order is updated
       req(rv$breaks)
       
       gg = ggplot(rv$ordered_data) +

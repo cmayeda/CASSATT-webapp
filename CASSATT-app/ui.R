@@ -27,7 +27,7 @@ shinyUI(fluidPage(
               tags$a(href = "https://cytolab.github.io", "Cytolab Home")
           ), 
           actionButton("hide_help", "Hide help text"),
-          actionButton("colorblind", "colorblind mode")
+          actionButton("colormode", "colorblind mode")
       )
   ),
   
