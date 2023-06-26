@@ -5,8 +5,7 @@ shinyServer(function(input, output, session) {
 
   rv <- reactiveValues(
     expr_img_list = paste0("www/assets/feature_expr/", list.files("www/assets/feature_expr/", pattern = ".jpg")),
-    cluster_plot = paste0("www/assets/clusters_summertime.png"),
-    cluster_legend = paste0("www/assets/clusters_summertime_legend.png")
+    colormode = "custom"
   )
   
   # -- Help Text -- 
@@ -20,15 +19,13 @@ shinyServer(function(input, output, session) {
   })
   
   # -- Colorblind Setting -- 
-  observeEvent(input$colorblind, {
-    if (input$colorblind %% 2 == 1) {
+  observeEvent(input$colormode, {
+    if (input$colormode %% 2 == 1) {
       rv$expr_img_list <<- paste0("www/assets/feature_expr/colorblind/", list.files("www/assets/feature_expr/colorblind/", pattern = ".jpg"))
-      rv$cluster_plot <<- paste0("www/assets/clusters_colorblind.png")
-      rv$cluster_legend <<- paste0("www/assets/clusters_colorblind_legend.png")
+      rv$colormode <<- "viridis"
     } else {
       rv$expr_img_list <<- paste0("www/assets/feature_expr/", list.files("www/assets/feature_expr/", pattern = ".jpg"))
-      rv$cluster_plot <<- paste0("www/assets/clusters_summertime.png")
-      rv$cluster_legend <<- paste0("www/assets/clusters_summertime_legend.png")
+      rv$colormode <<- "custom"
     }
   })
   
@@ -43,7 +40,7 @@ shinyServer(function(input, output, session) {
   output$expr_PDL <- renderImage({ list(src = rv$expr_img_list[8]) }, deleteFile = FALSE)
   
   # -- 6: Population ID -- 
-  pop_clickable_server("pop_clickable")
+  pop_clickable_server("pop_clickable", rv)
   
   # -- 7: Neighborhood ID & Analysis -- 
   callModule(neighborhood_clickable_server, "neighborhood_clickable")
