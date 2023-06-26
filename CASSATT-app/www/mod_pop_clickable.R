@@ -71,7 +71,8 @@ pop_clickable_server <- function(id) {
     
     rv <- reactiveValues(ordered_data = neighborhood_data,
                          col = "pop_ID",
-                         pal = summertime_pal)
+                         pal = summertime_pal,
+                         breaks = names(summertime_pal))
     
     # initial plot data order 
     observeEvent( input$plot_selected, {
@@ -83,14 +84,20 @@ pop_clickable_server <- function(id) {
       if(input$method == "kmeans clustering") { 
         rv$col <<- "kmeans_cluster"
         rv$pal <<- summertime_expanded
+        rv$breaks <<- as.character(0:15)
       } else {
         rv$col <<- "pop_ID"
         rv$pal <<- summertime_pal
+        rv$breaks <<- names(summertime_pal)
       }
     }, ignoreInit = TRUE)
     
     # interactive plot and legend 
     output$plot <- renderGirafe({ 
+      
+      # delay updating plot until breaks have been updated 
+      req(rv$breaks)
+      
       gg = ggplot(rv$ordered_data) +
         geom_point_interactive(aes(
           x = Global_x, y = Global_y,
@@ -101,7 +108,7 @@ pop_clickable_server <- function(id) {
         scale_color_manual_interactive(
           name = "Population",
           values = rv$pal,
-          breaks = names(rv$pal),
+          breaks = rv$breaks,
           data_id = function(breaks) { breaks },
           labels = function(breaks) { lapply(breaks, function(br) {
             label_interactive(br, data_id = br)
@@ -119,6 +126,8 @@ pop_clickable_server <- function(id) {
     observeEvent( input$plot_key_selected, {
       if (!is.null(input$plot_key_selected)) {
         selected <<- input$plot_key_selected
+        br_step = rv$breaks[!rv$breaks == selected]
+        rv$breaks <<- c(selected, br_step)
         indxs = which(rv$ordered_data[, rv$col] == selected)
         step = rv$ordered_data[-indxs, ]
         rv$ordered_data <<- rbind(step, rv$ordered_data[indxs, ])
@@ -130,6 +139,8 @@ pop_clickable_server <- function(id) {
     observeEvent( input$plot_selected, {
       if (!is.null(input$plot_selected)) {
         selected <<- input$plot_selected
+        br_step = rv$breaks[!rv$breaks == selected]
+        rv$breaks <<- c(selected, br_step)
         indxs = which(rv$ordered_data[, rv$col] == selected)
         step = rv$ordered_data[-indxs, ]
         rv$ordered_data <<- rbind(step, rv$ordered_data[indxs, ])

@@ -40,7 +40,7 @@ summertime_expanded = c(
 )
 set.seed(3)
 summertime_expanded <- sample(summertime_expanded)
-names(summertime_expanded) <- as.character(1:15)
+names(summertime_expanded) <- as.character(0:14)
 
 
 
