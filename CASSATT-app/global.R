@@ -12,3 +12,5 @@ source("www/custom_themes_palettes.R")
 
 neighborhood_data = read.csv("www/neighborhood_data.csv")
 neighborhood_data$kmeans_cluster <- as.factor(neighborhood_data$kmeans_cluster)
+
+dot_size = 2

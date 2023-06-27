@@ -25,27 +25,6 @@ pop_clickable_ui <- function(id) {
   )
 }
 
-dot_size = 2
-
-outline_click = "#fbb700"
-outline_hover = "#ddcca1"
-text_click = "#000000"
-text_hover = "#515151"
-
-gir_options = list(
-  opts_toolbar(saveaspng = FALSE),
-  opts_hover(css = paste0("stroke:",outline_hover,"; stroke-width:1px;")),
-  opts_hover_key(css = girafe_css(
-    css = paste0("stroke:",outline_hover,"; stroke-width:1px;"),
-    text = paste0("stroke:",text_hover,"; stroke-width:0.5px;")
-  )),
-  opts_selection(css = paste0("stroke:",outline_click,"; stroke-width:1px;"), type = "single"),
-  opts_selection_key(css = girafe_css(
-    css = paste0("stroke:",outline_click,"; stroke-width:1px"),
-    text = paste0("stroke-width:0.5px; stroke:",text_click,";")
-  ), type = "single")
-)
-
 pop_clickable_server <- function(id, server_rv) {
   moduleServer(id, function(input, output, session) {
     
@@ -53,6 +32,25 @@ pop_clickable_server <- function(id, server_rv) {
                          col = "pop_ID",
                          pal = summertime_pal,
                          breaks = names(summertime_pal))
+    
+    outline_click = "#fbb700"
+    outline_hover = "#ddcca1"
+    text_click = "#000000"
+    text_hover = "#515151"
+    
+    gir_options = list(
+      opts_toolbar(saveaspng = FALSE),
+      opts_hover(css = paste0("stroke:",outline_hover,"; stroke-width:1px;")),
+      opts_hover_key(css = girafe_css(
+        css = paste0("stroke:",outline_hover,"; stroke-width:1px;"),
+        text = paste0("stroke:",text_hover,"; stroke-width:0.5px;")
+      )),
+      opts_selection(css = paste0("stroke:",outline_click,"; stroke-width:1px;"), type = "single"),
+      opts_selection_key(css = girafe_css(
+        css = paste0("stroke:",outline_click,"; stroke-width:1px"),
+        text = paste0("stroke-width:0.5px; stroke:",text_click,";")
+      ), type = "single")
+    )
     
     # initial plot data order 
     observeEvent( input$plot_selected, {

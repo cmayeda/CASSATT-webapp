@@ -8,7 +8,10 @@ def run_voronoi(neighbor_coords):
   return(vor)
 
 def find_voronoi(vor, input_cell):
-  input_x = np.asarray(input_cell.get("X1"))
+  print(type(input_cell))
+  # print(input_cell["Global_x"])
+  
+  input_x = np.asarray(input_cell["Global_x"])
   input_cell_indx = np.intersect1d(vor.points[:, 0], input_x, return_indices = True)[1]
   input_region = vor.regions[int(vor.point_region[input_cell_indx])] # list of vertices indexes
 
@@ -21,11 +24,17 @@ def find_voronoi(vor, input_cell):
 
   # find cells at the center of neighbor regions
   neighbor_points = []
+  indxes = []
   for cell_indx, region_indx in enumerate(vor.point_region):
     if region_indx in neighbor_region_indx:
-      neighbor_points.append(vor.points[cell_indx])
+      # neighbor_points.append(vor.points[cell_indx])
+      indxes.append(cell_indx)
 
-  return(neighbor_points)
+  # return(neighbor_points)
+  
+  # find indexes of cells 
+  return(indxes)
+  
 
 def run_shell(neighbor_coords, distance):
   n_coords_array = np.asarray(neighbor_coords)
