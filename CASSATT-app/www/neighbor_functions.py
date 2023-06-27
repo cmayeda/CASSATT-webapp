@@ -8,9 +8,6 @@ def run_voronoi(neighbor_coords):
   return(vor)
 
 def find_voronoi(vor, input_cell):
-  print(type(input_cell))
-  # print(input_cell["Global_x"])
-  
   input_x = np.asarray(input_cell["Global_x"])
   input_cell_indx = np.intersect1d(vor.points[:, 0], input_x, return_indices = True)[1]
   input_region = vor.regions[int(vor.point_region[input_cell_indx])] # list of vertices indexes
@@ -24,16 +21,11 @@ def find_voronoi(vor, input_cell):
 
   # find cells at the center of neighbor regions
   neighbor_points = []
-  indxes = []
   for cell_indx, region_indx in enumerate(vor.point_region):
     if region_indx in neighbor_region_indx:
-      # neighbor_points.append(vor.points[cell_indx])
-      indxes.append(cell_indx)
+      neighbor_points.append(vor.points[cell_indx])
 
-  # return(neighbor_points)
-  
-  # find indexes of cells 
-  return(indxes)
+  return(neighbor_points)
   
 
 def run_shell(neighbor_coords, distance):
@@ -57,7 +49,7 @@ def run_shell(neighbor_coords, distance):
 def find_shell(neighbor_coords, s_neighbors, input_cell):
 
   # match input cell x and y to coords
-  input_x = np.asarray(input_cell.get("X1"))
+  input_x = np.asarray(input_cell["Global_x"])
   input_cell_indx = np.intersect1d(np.asarray(neighbor_coords)[:, 0], input_x, return_indices = True)[1]
 
   # take indx from coords, use it to find shell dict item
@@ -72,6 +64,9 @@ def find_shell(neighbor_coords, s_neighbors, input_cell):
       neighbor_points.append(neighbor_coords.iloc[int(cell_indx)])
 
     return(neighbor_points)
+  
+  else: 
+    return("None")
   
 def run_knn(neighbor_coords, n_neighbors):
   n_coords_array = np.asarray(neighbor_coords)
@@ -91,7 +86,7 @@ def run_knn(neighbor_coords, n_neighbors):
 def find_knn(neighbor_coords, knn_neighbors, input_cell):
 
   # match input cell x and y to coords
-  input_x = np.asarray(input_cell.get("X1"))
+  input_x = np.asarray(input_cell["Global_x"])
   input_cell_indx = np.intersect1d(np.asarray(neighbor_coords)[:, 0], input_x, return_indices = True)[1]
 
   # take indx from coords, use it to find shell dict item
