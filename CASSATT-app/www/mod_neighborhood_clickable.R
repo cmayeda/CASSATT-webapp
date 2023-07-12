@@ -109,14 +109,9 @@ neighborhood_clickable_server <- function(input, output, session) {
             ui = tags$h5(id = "s_warning", "Warning: shell neighbors has not been run for this distance.")
           )
           SHELL_WPRESENT <<- TRUE
-          rv$ordered_coords <<- rv$ordered_coords[1:6406, ]
+          rv$ordered_coords <<- rv$ordered_coords[1:6406, ] 
         } else if (BOOL_SHELL == FALSE) {
           neighbor_points <- as.data.frame(t(sapply(find_shell(coords, rv$s_neighbors, selected_row), c)))
-          if (nrow(neighbor_points) == 1) {
-            if (neighbor_points == "None") { 
-              neighbor_points <- data.frame()
-            }
-          }
         }
       } else {
         if (BOOL_KNN & (KNN_WPRESENT == FALSE)) {
@@ -131,10 +126,12 @@ neighborhood_clickable_server <- function(input, output, session) {
         }
       }
 
-      if (nrow(neighbor_points) > 0) {
+      if (nrow(neighbor_points) > 0 & ncol(neighbor_points) == 2) {
         neighbor_points <- cbind(neighbor_points, rep("neighbor", nrow(neighbor_points)))
         colnames(neighbor_points) <- c("Global_x","Global_y","status")
         rv$ordered_coords <<- rbind(rv$ordered_coords[1:6406, ], neighbor_points, selected_row)
+      } else {
+        rv$ordered_coords <<- isolate(rv$ordered_coords[1:6406, ])
       }
     }
   }, ignoreInit = TRUE, ignoreNULL = FALSE)
@@ -206,6 +203,7 @@ neighborhood_clickable_server <- function(input, output, session) {
     }
   
     # wipe plot on method change
+    gc()
     rv$ordered_coords <<- isolate(rv$ordered_coords[1:6406, ])
     selected <<- character(0)
   })

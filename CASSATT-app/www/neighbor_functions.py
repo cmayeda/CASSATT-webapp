@@ -56,17 +56,12 @@ def find_shell(neighbor_coords, s_neighbors, input_cell):
   s_list = list(s_neighbors.values())
   neighbors = s_list[int(input_cell_indx)]
 
-  if len(neighbors) > 0:
-    
-    # return neighbors as coordinate pairs
-    neighbor_points = []
-    for cell_indx in neighbors:
-      neighbor_points.append(neighbor_coords.iloc[int(cell_indx)])
+  # return neighbors as coordinate pairs
+  neighbor_points = []
+  for cell_indx in neighbors:
+    neighbor_points.append(neighbor_coords.iloc[int(cell_indx)])
 
-    return(neighbor_points)
-  
-  else: 
-    return("None")
+  return(neighbor_points)
   
 def run_knn(neighbor_coords, n_neighbors):
   n_coords_array = np.asarray(neighbor_coords)
