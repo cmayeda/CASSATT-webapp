@@ -3,11 +3,12 @@ import pandas as pd
 from scipy.spatial import Voronoi
 from grispy import GriSPy
 
-def run_voronoi(neighbor_coords):
-  vor = Voronoi(np.asarray(neighbor_coords))
-  return(vor)
+coords = neighborhood_data[["Global_x", "Global_y"]]
+coords_array = np.asarray(coords)
+coords_gsp = GriSPy(coords_array)
+vor = Voronoi(np.asarray(coords))
 
-def find_voronoi(vor, input_cell):
+def find_voronoi(input_cell):
   input_x = np.asarray(input_cell["Global_x"])
   input_cell_indx = np.intersect1d(vor.points[:, 0], input_x, return_indices = True)[1]
   input_region = vor.regions[int(vor.point_region[input_cell_indx])] # list of vertices indexes
@@ -20,21 +21,19 @@ def find_voronoi(vor, input_cell):
         neighbor_region_indx.append(region_indx)
 
   # find cells at the center of neighbor regions
-  neighbor_points = []
+  neighbor_indexes = []
   for cell_indx, region_indx in enumerate(vor.point_region):
     if region_indx in neighbor_region_indx:
-      neighbor_points.append(vor.points[cell_indx])
+      neighbor_indexes.append(cell_indx)
 
-  return(neighbor_points)
+  neighbor_data = neighborhood_data.iloc[neighbor_indexes]
+  return(neighbor_data)
   
-
-def run_shell(neighbor_coords, distance):
-  n_coords_array = np.asarray(neighbor_coords)
-  gsp = GriSPy(n_coords_array)
+def run_shell(distance):
   upper_radii = float(distance)
   lower_radii = 0.01
-  shell_dist, shell_ind = gsp.shell_neighbors(
-       n_coords_array,
+  shell_dist, shell_ind = coords_gsp.shell_neighbors(
+       coords_array,
        distance_lower_bound = lower_radii,
        distance_upper_bound = upper_radii
   )
@@ -46,28 +45,22 @@ def run_shell(neighbor_coords, distance):
 
   return(shell_neighbors)
       
-def find_shell(neighbor_coords, s_neighbors, input_cell):
+def find_shell(s_neighbors, input_cell):
 
   # match input cell x and y to coords
   input_x = np.asarray(input_cell["Global_x"])
-  input_cell_indx = np.intersect1d(np.asarray(neighbor_coords)[:, 0], input_x, return_indices = True)[1]
+  input_cell_indx = np.intersect1d(np.asarray(coords)[:, 0], input_x, return_indices = True)[1]
 
   # take indx from coords, use it to find shell dict item
   s_list = list(s_neighbors.values())
-  neighbors = s_list[int(input_cell_indx)]
-
-  # return neighbors as coordinate pairs
-  neighbor_points = []
-  for cell_indx in neighbors:
-    neighbor_points.append(neighbor_coords.iloc[int(cell_indx)])
-
-  return(neighbor_points)
+  neighbor_indexes = s_list[int(input_cell_indx)]
+  neighbor_indexes = [int(x) for x in neighbor_indexes]
+  neighbor_data = neighborhood_data.iloc[neighbor_indexes]
+  return(neighbor_data)
   
-def run_knn(neighbor_coords, n_neighbors):
-  n_coords_array = np.asarray(neighbor_coords)
-  gsp = GriSPy(n_coords_array)
-  knn_dist, knn_ind = gsp.nearest_neighbors(
-      n_coords_array,
+def run_knn(n_neighbors):
+  knn_dist, knn_ind = coords_gsp.nearest_neighbors(
+      coords_array,
       n = int(n_neighbors)
   )
   knn_neighbors = {}
@@ -78,21 +71,31 @@ def run_knn(neighbor_coords, n_neighbors):
       
   return(knn_neighbors)
 
-def find_knn(neighbor_coords, knn_neighbors, input_cell):
+def find_knn(knn_neighbors, input_cell):
 
   # match input cell x and y to coords
   input_x = np.asarray(input_cell["Global_x"])
-  input_cell_indx = np.intersect1d(np.asarray(neighbor_coords)[:, 0], input_x, return_indices = True)[1]
+  input_cell_indx = np.intersect1d(np.asarray(coords)[:, 0], input_x, return_indices = True)[1]
 
   # take indx from coords, use it to find shell dict item
   knn_list = list(knn_neighbors.values())
-  neighbors = knn_list[int(input_cell_indx)]
-
-  if len(neighbors) > 0:
-    
-    # return neighbors as coordinate pairs
-    neighbor_points = []
-    for cell_indx in neighbors:
-      neighbor_points.append(neighbor_coords.iloc[int(cell_indx)])
-
-    return(neighbor_points)
+  neighbor_indexes = knn_list[int(input_cell_indx)]
+  neighbor_indexes = [int(x) for x in neighbor_indexes]
+  neighbor_data = neighborhood_data.iloc[neighbor_indexes]
+  return(neighbor_data)
+  
+def deca_colors(slide_data, neighbor_indexes): 
+  neighbor_data = slide_data.iloc[:, 0:14].mean()
+  
+  d_turtle = {}
+  
+  return(neighbor_data)
+  
+  
+  
+  
+  
+  
+  
+  
+  
