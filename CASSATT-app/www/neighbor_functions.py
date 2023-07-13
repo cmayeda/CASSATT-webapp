@@ -7,6 +7,21 @@ coords = neighborhood_data[["Global_x", "Global_y"]]
 coords_array = np.asarray(coords)
 coords_gsp = GriSPy(coords_array)
 vor = Voronoi(np.asarray(coords))
+pop_colors = {
+  "Tumor.A" : "#3d3456",
+  "Tumor.B" : "#75647a",
+  "CD4T.A" : "#971a00",
+  "CD4T.B" : "#702512",
+  "CD4T.C" : "#4b220a",
+  "CD8T.A" : "#41657c",
+  "CD8T.B" : "#223d63",
+  "DNT.A" : "#e6c170",
+  "DNT.B" : "#c28200",
+  "Microglia.A" : "#354953",
+  "Microglia.B" : "#1d2b22",
+  "Macrophage.A" : "#d06a24",
+  "Macrophage.B" : "#9e4200"
+}
 
 def find_voronoi(input_cell):
   input_x = np.asarray(input_cell["Global_x"])
@@ -84,12 +99,33 @@ def find_knn(knn_neighbors, input_cell):
   neighbor_data = neighborhood_data.iloc[neighbor_indexes]
   return(neighbor_data)
   
-def deca_colors(slide_data, neighbor_indexes): 
-  neighbor_data = slide_data.iloc[:, 0:14].mean()
-  
+def deca_colors(neighbor_data): 
+  rounded = neighbor_data.iloc[:, 0:14].mean()
+  rounded = pd.DataFrame(rounded[1:])
+  rounded['dec'] = rounded.apply(lambda x: np.floor(x*10))
+  rounded['rem'] = rounded[0].apply(lambda x: (x*10)-int(x*10))
+  tot = 10 - int(rounded['dec'].sum())
+  rounded.nlargest(tot, ['rem'])['dec'].apply(lambda x : x + 1)
+  rounded.update(pd.DataFrame(rounded.nlargest(tot, ['rem'])['dec'].apply(lambda x : x + 1)))
+  rounded['dec'] = rounded['dec'].apply(np.int64)
+  rounded = rounded.sort_values(by = ['dec'], ascending = False)
+  for_dec = rounded[rounded.dec != 0].reset_index()
+
+  d_dec = {}
+  for index, row in for_dec.iterrows():
+      d_dec[row['index']] = row['dec']
   d_turtle = {}
+  count2 = 0
+  for key, val in d_dec.items():
+      count = val
+      while count > 0:
+          d_turtle[count2] = pop_colors[key]
+          count -= 1
+          count2 +=1
+      else:
+          count = 0
   
-  return(neighbor_data)
+  return(d_turtle)
   
   
   

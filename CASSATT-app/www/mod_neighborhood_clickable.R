@@ -13,6 +13,8 @@ neighborhood_data = read.csv("www/neighborhood_data.csv")
 py$neighborhood_data <- neighborhood_data
 coords = neighborhood_data[, c("Global_x","Global_y")]
 status = c(rep("unselected", nrow(coords)))
+py$vor_pops <- as.list(summertime_pal)
+decagons = read.csv("www/decagons.csv")
 
 source_python("www/neighbor_functions.py")
 
@@ -20,40 +22,37 @@ neighborhood_clickable_ui <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(
-      column(10, offset = 1,
+      column(6,
+        girafeOutput(ns("plot"))
+      ),
+      column(6, 
         fluidRow(
-          column(7,
-            girafeOutput(ns("plot"))
-          ),
-          column(5, 
+          column(6, 
             tags$div(class = "config_menu",
-              selectInput(ns("method"),
-                          label = "Select a neighborhood identification method",
-                          choices = c("voronoi", "shell", "knn"),
-                          selected = "voronoi"),
-              numericInput(ns("n_neighbors"), 
-                           label = "Number of nearest neighbors",
-                           value = 10, min = 5, max = 30),
-              numericInput(ns("distance"),
-                           label = "Distance in pixels",
-                           value = 70, min = 0, max = 300),
+              selectInput(ns("method"), label = "Select an identification method",
+                          choices = c("voronoi", "shell", "knn"), selected = "voronoi"),
+              numericInput(ns("num"), label = "Number of nearest neighbors", value = 10, min = 5, max = 30),
               tags$div(id = "warning", class = "warning"), 
-              actionButton(ns("run_shell"), "Calculate shell neighbors"),
-              actionButton(ns("run_knn"), "Calculate nearest neighbors"),
-            ),
-            plotOutput(ns("decagons"))
-            ),
+              actionButton(ns("run"), "Calculate nearest neighbors")
+            )
           ),
-          fluidRow(
-            column(8, offset = 2, 
-              tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
-              nec tellus imperdiet, mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. 
-              Etiam ac turpis bibendum, fermentum enim vitae, feugiat nulla. Morbi pharetra euismod dictum. 
-              Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.")
-            )        
+          column(6,
+            tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
+            nec tellus imperdiet, mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. 
+            Etiam ac turpis bibendum, fermentum enim vitae, feugiat nulla.")
           )
+        ),
+        fluidRow(
+          column(6, plotOutput(ns("decagons"))),
+          # column(6, )
         )
-      )
+      ),
+
+      
+      
+
+    ),
+
   )
 }
 
@@ -64,7 +63,8 @@ neighborhood_clickable_ui <- function(id) {
 neighborhood_clickable_server <- function(input, output, session) {
   
   rv <- reactiveValues(ordered_coords = as.data.frame(cbind(coords, status)),
-                       s_neighbors = data.frame())
+                       s_neighbors = data.frame(),
+                       neighbor_data = data.frame())
   
   fill_click = "#fbb700"
   fill_hover = "#ddcca1"
@@ -91,34 +91,27 @@ neighborhood_clickable_server <- function(input, output, session) {
     girafe(ggobj = gg, options = gir_options) 
   })
   
-  # set up for reactive warnings 
-  BOOL_SHELL = FALSE
-  BOOL_KNN = FALSE
-  WPRESENT = FALSE
-  
-  observeEvent( input$distance, {
-    BOOL_SHELL <<- TRUE
-  }, ignoreInit = TRUE)
-  
-  observeEvent( input$n_neighbors, {
-    BOOL_KNN <<- TRUE
-  }, ignoreInit = TRUE)
+  # run shell & knn once on load 
+  observeEvent( input$run, {
+    rv$s_neighbors <<- run_shell(70)
+    rv$knn_neighbors <<- run_knn(10)
+  }, ignoreNULL = FALSE, ignoreInit = FALSE, once = TRUE)
   
   # hide and show controls based on neighbor ID method
   observe({
     if (input$method == "knn") {
-      showElement("n_neighbors")
-      showElement("run_knn")
+      updateNumericInput(session, "num", label = "Number of nearest neighbors", value = 10, min = 5, max = 30)
+      updateActionButton(session, "run", label = "Calculate nearest neighbors")
+      showElement("num")
+      showElement("run")
+    } else if (input$method == "shell") {
+      updateNumericInput(session, "num", label = "Distance in pixels", value = 70, min = 1, max = 300)
+      updateActionButton(session, "run", label = "Calculate shell neighbors")
+      showElement("num")
+      showElement("run")
     } else {
-      hideElement("n_neighbors")
-      hideElement("run_knn")
-    }
-    if (input$method == "shell") {
-      showElement("distance")
-      showElement("run_shell")
-    } else {
-      hideElement("distance")
-      hideElement("run_shell")
+      hideElement("num")
+      hideElement("run")
     }
     
     # wipe plot on method change
@@ -127,92 +120,77 @@ neighborhood_clickable_server <- function(input, output, session) {
     selected <<- character(0)
   })
   
-  # run shell & knn once on load 
-  observeEvent( input$run_shell, {
-    rv$s_neighbors <<- run_shell(input$distance)
-    rv$knn_neighbors <<- run_knn(input$n_neighbors)
-  }, ignoreNULL = FALSE, ignoreInit = FALSE, once = TRUE)
-  
-  # calculate shell neighbors on btn press  
-  observeEvent( input$run_shell, {
-    if (isTruthy(input$distance) & input$method == "shell") {
-      BOOL_SHELL <<- FALSE
-      rv$s_neighbors <<- run_shell(input$distance)
-      if (WPRESENT == TRUE) {
-        removeUI(selector = "#s_warning", immediate = TRUE)
-        WPRESENT <<- FALSE
-      }
-    }
-  })
-  
-  # calculate knn neighbors on btn press 
-  observeEvent( input$run_knn, {
-    if (isTruthy(input$n_neighbors) & input$method == "knn") {
-      BOOL_KNN <<- FALSE
-      rv$knn_neighbors <<- run_knn(input$n_neighbors)
-      if (WPRESENT == TRUE) {
-        removeUI(selector = "#k_warning", immediate = TRUE)
-        WPRESENT <<- FALSE
-      }
-    }
+  # set up warnings 
+  RUN_NEEDED = FALSE
+  WPRESENT = FALSE
+  observeEvent( input$num, {
+    RUN_NEEDED <<- TRUE
   }, ignoreInit = TRUE)
   
-  # color plot based on red clicked cell, and blue neighbor cells
-  # add warnings if algos have not been run
-  selected = NULL
-  observeEvent( input$plot_selected, {
-    if (is.null(input$plot_selected)) { 
+  # run method on btn press 
+  observeEvent( input$run, {
+    if (isTruthy(input$num) & RUN_NEEDED) {
       selected <<- character(0)
       rv$ordered_coords <<- rv$ordered_coords[1:6406, ]
       
-    # do not run if two points get selected simultaneously
-    } else if(nchar(input$plot_selected) > 4) {
+      if (input$method == "shell") {
+        rv$s_neighbors <<- run_shell(input$num)
+      } else {
+        rv$n_neighbors <<- run_knn(input$num)
+      }
+      RUN_NEEDED <<- FALSE
+      if (WPRESENT) { # remove warning 
+        removeUI(selector = "#warning h5", immediate = TRUE)
+        WPRESENT <<- FALSE
+      }
+    } 
+  })
+  
+  # color plot based on red clicked cell, and blue neighbor cells
+  selected = NULL
+  observeEvent( input$plot_selected, {
+    
+    str(input$plot_selected)
+
+    if (nchar(input$plot_selected) > 4 | RUN_NEEDED) { 
       selected <<- character(0)
       rv$ordered_coords <<- rv$ordered_coords[1:6406, ]
+      
+      # add warning
+      if (!WPRESENT & RUN_NEEDED) { 
+        if (input$method == "shell") {
+          insertUI(selector = "#warning",
+            ui = tags$h5(id = "s_warning", "Warning: shell neighbors has not been run for this distance."))
+        } else {
+          insertUI(selector = "#warning",
+            ui = tags$h5(id = "k_warning", "Warning: knn neighbors has not been run for this k value"))
+        }
+        WPRESENT <<- TRUE
+      }
     } else {
       selected <<- input$plot_selected
       selected_row = rv$ordered_coords[as.numeric(selected), ]
       selected_row$status <- "selected"
-      neighbor_data <- data.frame()
       
       if (input$method == "voronoi") {
-        neighbor_data <- find_voronoi(selected_row) 
-        
+        rv$neighbor_data <<- find_voronoi(selected_row) 
       } else if (input$method == "shell") {
-        if (BOOL_SHELL & (WPRESENT == FALSE)) {
-          insertUI(
-            selector = "#warning",
-            ui = tags$h5(id = "s_warning", "Warning: shell neighbors has not been run for this distance.")
-          )
-          WPRESENT <<- TRUE
-          rv$ordered_coords <<- rv$ordered_coords[1:6406, ]
-        } else if (BOOL_SHELL == FALSE) {
-          neighbor_data <- find_shell(rv$s_neighbors, selected_row) 
-        }
-      } else {
-        if (BOOL_KNN & (WPRESENT == FALSE)) {
-          insertUI(
-            selector = "#warning",
-            ui = tags$h5(id = "k_warning", "Warning: knn neighbors has not been run for this k value")
-          )
-          WPRESENT <<- TRUE
-          rv$ordered_coords <<- rv$ordered_coords[1:6406, ] 
-        } else if (BOOL_KNN == FALSE) {
-          neighbor_data <- find_knn(rv$knn_neighbors, selected_row)
-        }
+        rv$neighbor_data <- find_shell(rv$s_neighbors, selected_row) 
+      } else if (input$method == "knn") {
+        rv$neighbor_data <- find_knn(rv$knn_neighbors, selected_row)
       }
 
-      if (nrow(neighbor_data) > 0 & ncol(neighbor_data) > 1) {
+      if (nrow(rv$neighbor_data) > 0 & ncol(rv$neighbor_data) > 1) {
         neighbor_coords <- cbind(
-          neighbor_data[, c("Global_x", "Global_y")], 
-          status = rep("neighbor", nrow(neighbor_data))
+          rv$neighbor_data[, c("Global_x", "Global_y")], 
+          status = rep("neighbor", nrow(rv$neighbor_data))
         )
         rv$ordered_coords <<- rbind(rv$ordered_coords[1:6406, ], neighbor_coords, selected_row)
       } else {
         rv$ordered_coords <<- isolate(rv$ordered_coords[1:6406, ])
       }
     }
-  }, ignoreInit = TRUE, ignoreNULL = FALSE)
+  }, ignoreInit = TRUE, ignoreNULL = TRUE)
   
   # after reordering plot, re-select clicked population 
   session$onFlushed(function() {
@@ -221,11 +199,32 @@ neighborhood_clickable_server <- function(input, output, session) {
   
   # plot decagons of cluster cell types 
   output$decagons <- renderPlot({
-    if (nchar(input$plot_selected) < 4) {
-      neighbor_indexes <- find_voronoi(vor, input$plot_selected, mode = "indexes")
-      my_colors <- deca_colors(neighbor_indexes)
-      str(my_colors)
+    plot = ggplot(decagons)
+    
+    if (nrow(rv$neighbor_data) > 0) {
+      my_colors = deca_colors(rv$neighbor_data)
+      
+      for (i in 1:10) {
+        indxes = which(decagons$name == as.character(i))
+        plot <- plot + geom_polygon(
+          data = decagons[indxes, ], aes(x = x, y = y),
+          fill = my_colors[[i]],
+          color = "black", linewidth = 1.25
+        )
+      }
+      
+      plot <- plot + 
+        coord_fixed() + 
+        theme_bw() + 
+        theme(
+          axis.text = element_blank(),
+          axis.title = element_blank(),
+          axis.ticks = element_blank(), 
+          panel.border = element_blank(),
+          panel.grid = element_blank()
+        )
     }
+    return(plot)
   })
   
 }
