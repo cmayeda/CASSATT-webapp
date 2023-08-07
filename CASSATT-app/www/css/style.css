@@ -90,3 +90,11 @@ h3 {
 #navbar .action-button:not(#hide_help) {
   margin-right: 12px;
 }
+
+/* -- Step 8: Neighborhood Analysis -- */ 
+#decagons_col {
+  padding-right: 0px;
+}
+#deca_key_col {
+  padding-left: 0px;
+}

@@ -1,70 +1,31 @@
-library(ggplot2)
-library(reticulate)
-library(ggiraph)
-
-# -- FOR LOCAL
-# use_virtualenv("~/.virtualenvs/r-reticulate")
-
-# -- FOR DEPLOY
-# virtualenv_create("CASSATT-reticulate")
-# py_install("numpy")
-# py_install("pandas")
-# py_install("scipy")
-# py_install("grispy")
-# use_virtualenv("CASSATT-reticulate")
-
-source("www/custom_themes_palettes.R")
-
-neighborhood_data = read.csv("www/neighborhood_data.csv")
-neighborhood_data$kmeans_cluster <- as.factor(neighborhood_data$kmeans_cluster)
-
 pop_clickable_ui <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(
-      column(10, offset = 1,
+      column(6,
+        girafeOutput(ns("plot"))
+      ),
+      column(6,
         fluidRow(
-          column(7,
-            girafeOutput(ns("plot"))
-          ),
-          column(5, 
-              tags$div(class = "config_menu",
-                  selectInput(ns("method"),
-                      label = "Method of population identification",
-                      choices = c("expert gating", "kmeans clustering"),
-                      selected = "expert gating"),
-              ),
+          column(6, 
+            tags$div(class = "config_menu",
+              selectInput(ns("method"),
+                          label = "Method of population identification",
+                          choices = c("expert gating", "kmeans clustering"),
+                          selected = "expert gating"),
+              )
+            ),
+            column(6, 
               tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
               nec tellus imperdiet, mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. 
               Etiam ac turpis bibendum, fermentum enim vitae, feugiat nulla. Morbi pharetra euismod dictum. 
-              Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.")    
+              Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.") 
+            )
           )
-        ),
+        )
       )
     )
-  )
 }
-
-dot_size = 2
-
-outline_click = "#fbb700"
-outline_hover = "#ddcca1"
-text_click = "#000000"
-text_hover = "#515151"
-
-gir_options = list(
-  opts_toolbar(saveaspng = FALSE),
-  opts_hover(css = paste0("stroke:",outline_hover,"; stroke-width:1px;")),
-  opts_hover_key(css = girafe_css(
-    css = paste0("stroke:",outline_hover,"; stroke-width:1px;"),
-    text = paste0("stroke:",text_hover,"; stroke-width:0.5px;")
-  )),
-  opts_selection(css = paste0("stroke:",outline_click,"; stroke-width:1px;"), type = "single"),
-  opts_selection_key(css = girafe_css(
-    css = paste0("stroke:",outline_click,"; stroke-width:1px"),
-    text = paste0("stroke-width:0.5px; stroke:",text_click,";")
-  ), type = "single")
-)
 
 pop_clickable_server <- function(id, server_rv) {
   moduleServer(id, function(input, output, session) {
@@ -73,6 +34,25 @@ pop_clickable_server <- function(id, server_rv) {
                          col = "pop_ID",
                          pal = summertime_pal,
                          breaks = names(summertime_pal))
+    
+    outline_click = "#fbb700"
+    outline_hover = "#ddcca1"
+    text_click = "#000000"
+    text_hover = "#515151"
+    
+    gir_options = list(
+      opts_toolbar(saveaspng = FALSE),
+      opts_hover(css = paste0("stroke:",outline_hover,"; stroke-width:1px;")),
+      opts_hover_key(css = girafe_css(
+        css = paste0("stroke:",outline_hover,"; stroke-width:1px;"),
+        text = paste0("stroke:",text_hover,"; stroke-width:0.5px;")
+      )),
+      opts_selection(css = paste0("stroke:",outline_click,"; stroke-width:1px;"), type = "single"),
+      opts_selection_key(css = girafe_css(
+        css = paste0("stroke:",outline_click,"; stroke-width:1px"),
+        text = paste0("stroke-width:0.5px; stroke:",text_click,";")
+      ), type = "single")
+    )
     
     # initial plot data order 
     observeEvent( input$plot_selected, {

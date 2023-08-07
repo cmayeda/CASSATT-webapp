@@ -20,7 +20,8 @@ umap_data = read.csv(list.files()[5])
 
 ```{r, subset & export data}
 export_df = cbind(neighbor_data[, c("Global_x","Global_y","pop_ID")], umap_data$kmeans_cluster)
-colnames(export_df)[4] <- "kmeans_cluster"
+export_df <- cbind(neighbor_data[, c(1:14)], export_df)
+colnames(export_df)[ncol(export_df)] <- "kmeans_cluster"
 write.csv(export_df, "CASSATT-app/www/neighborhood_data.csv", row.names = FALSE)
 ```
 

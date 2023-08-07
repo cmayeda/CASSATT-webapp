@@ -2,14 +2,6 @@
 # created by Cass Mayeda 
 # 11/18/2022 
 
-suppressPackageStartupMessages({
-  library(shiny)
-  library(shinyjs)
-})
-
-source("www/mod_neighborhood_clickable.R")
-source("www/mod_pop_clickable.R")
-
 shinyUI(fluidPage(
   useShinyjs(),
   titlePanel("", windowTitle = "CASSATT"),
