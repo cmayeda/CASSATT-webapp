@@ -2,10 +2,13 @@ pop_clickable_ui <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(
-      column(6,
+      column(6, id = "pop_click_col", 
         girafeOutput(ns("plot"))
       ),
-      column(6,
+      column(1, id = "pop_boxes_col",
+        checkboxGroupInput(ns("visible_pops"), NULL, choices = c())
+      ),
+      column(5,
         fluidRow(
           column(6, 
             tags$div(class = "config_menu",
@@ -33,7 +36,8 @@ pop_clickable_server <- function(id, server_rv) {
     rv <- reactiveValues(ordered_data = neighborhood_data,
                          col = "pop_ID",
                          pal = summertime_pal,
-                         breaks = names(summertime_pal))
+                         breaks = names(summertime_pal)[1:13],
+                         visible = names(summertime_pal)[1:13])
     
     outline_click = "#fbb700"
     outline_hover = "#ddcca1"
@@ -59,10 +63,12 @@ pop_clickable_server <- function(id, server_rv) {
       rv$ordered_data <<- neighborhood_data
     }, ignoreInit = FALSE, ignoreNULL = FALSE, once = TRUE)
     
-    # toggle method types & colormode
+    # toggle method types & color mode, reset visibility 
     observeEvent( c(input$method, server_rv$colormode), {
+      rv$ordered_data <<- neighborhood_data
       if(input$method == "kmeans clustering") { 
         rv$col <<- "kmeans_cluster"
+        rv$visible <<- c(0:15)
         if (server_rv$colormode == "custom") { 
           rv$pal <<- summertime_expanded
         } else {
@@ -71,14 +77,69 @@ pop_clickable_server <- function(id, server_rv) {
         rv$breaks <<- as.character(0:15)
       } else {
         rv$col <<- "pop_ID"
+        rv$visible <<- names(summertime_pal)[1:13]
         if (server_rv$colormode == "custom") { 
           rv$pal <<- summertime_pal
         } else {
           rv$pal <<- viridis_expert
         }
-        rv$breaks <<- names(summertime_pal)
+        rv$breaks <<- names(summertime_pal)[1:13]
       }
     }, ignoreInit = TRUE)
+    
+    # show/hide populations by checkbox selection 
+    observeEvent( rv$breaks, {
+      updateCheckboxGroupInput(
+        session, "visible_pops", label = NULL, 
+        choices = rv$breaks, selected = rv$visible)
+    })
+    
+    observeEvent( input$visible_pops, {
+      
+      # remove a population, keep a blank row for legend 
+      rm = setdiff(rv$visible, input$visible_pops)
+      if (length(rm) > 0) { 
+        indxs = which(rv$ordered_data[, rv$col] == rm)
+        blank_row = as.data.frame(matrix(ncol = 18))
+        colnames(blank_row) <- colnames(rv$ordered_data)
+        blank_row$Global_x <- 500
+        blank_row$Global_y <- 51
+        blank_row[, rv$col] <- unique(rv$ordered_data[indxs, rv$col])
+        rv$ordered_data <<- rbind(rv$ordered_data[-indxs, ], blank_row)
+        
+        # reorder breaks  
+        br_step = rv$breaks[!rv$breaks == rm]
+        rv$breaks <<- c(br_step, rm)
+        
+        # set color to white 
+        rv$pal[rm] <<- "#ffffff"
+        
+        # unselect in key 
+        if (rm == selected) {
+          selected <<- character(0)
+        }
+      }
+       
+      # add back a population, remove blank row 
+      ad = setdiff(input$visible_pops, rv$visible) 
+      if (length(ad) > 0) {
+        blank_indx = which(rv$ordered_data[, rv$col] == ad)
+        step = rv$ordered_data[-blank_indx, ]
+        ad_indxs = which(neighborhood_data[, rv$col] == ad)
+        rv$ordered_data <<- rbind(step, neighborhood_data[ad_indxs, ]) 
+        
+        # reorder breaks 
+        br_step = rv$breaks[!rv$breaks == ad]
+        rv$breaks <<- c(ad, br_step)
+        
+        # replace color 
+        rv$pal[ad] <<- summertime_pal[ad]
+        
+        # select in key and on plot
+        selected <<- ad
+      }
+      rv$visible <<- input$visible_pops
+    }, ignoreInit = TRUE, ignoreNULL = TRUE)
     
     # interactive plot and legend 
     output$plot <- renderGirafe({ 
