@@ -3,10 +3,12 @@ import pandas as pd
 from scipy.spatial import Voronoi
 from grispy import GriSPy
 
+neighborhood_data = pd.read_csv("www/neighborhood_data.csv")
 coords = neighborhood_data[["Global_x", "Global_y"]]
 coords_array = np.asarray(coords)
 coords_gsp = GriSPy(coords_array)
 vor = Voronoi(np.asarray(coords))
+
 pop_colors = {
   "Tumor.A" : "#3d3456",
   "Tumor.B" : "#75647a",
@@ -126,8 +128,6 @@ def deca_colors(neighbor_data):
           count = 0
   
   return(d_turtle)
-  
-  
   
   
   

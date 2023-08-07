@@ -9,11 +9,19 @@
 # py_install("grispy")
 # use_virtualenv("CASSATT-reticulate")
 
+library(cowplot)
+library(grid)
+library(gridExtra)
+
 neighborhood_data = read.csv("www/neighborhood_data.csv")
-py$neighborhood_data <- neighborhood_data
+# py$neighborhood_data <- neighborhood_data
+r_to_py(neighborhood_data)
+
 coords = neighborhood_data[, c("Global_x","Global_y")]
 status = c(rep("unselected", nrow(coords)))
-py$vor_pops <- as.list(summertime_pal)
+# py$vor_pops <- as.list(summertime_pal)
+# r_to_py(as.list(summertime_pal))
+
 decagons = read.csv("www/decagons.csv")
 
 source_python("www/neighbor_functions.py")
@@ -43,16 +51,16 @@ neighborhood_clickable_ui <- function(id) {
           )
         ),
         fluidRow(
-          column(6, plotOutput(ns("decagons"))),
-          # column(6, )
+          tags$h5("Decagon visualization"), 
+          column(4, id = "decagons_col", 
+            plotOutput(ns("decagons"), height = "200px")
+          ),
+          column(4, id = "deca_key_col", 
+            plotOutput(ns("deca_key"), height = "200px")
+          )
         )
-      ),
-
-      
-      
-
-    ),
-
+      )
+    )
   )
 }
 
@@ -63,8 +71,10 @@ neighborhood_clickable_ui <- function(id) {
 neighborhood_clickable_server <- function(input, output, session) {
   
   rv <- reactiveValues(ordered_coords = as.data.frame(cbind(coords, status)),
+                       knn_neighbors = data.frame(), 
                        s_neighbors = data.frame(),
-                       neighbor_data = data.frame())
+                       neighbor_data = data.frame(),
+                       d_colors = as.list(rep("#ffffff", 10)))
   
   fill_click = "#fbb700"
   fill_hover = "#ddcca1"
@@ -136,7 +146,7 @@ neighborhood_clickable_server <- function(input, output, session) {
       if (input$method == "shell") {
         rv$s_neighbors <<- run_shell(input$num)
       } else {
-        rv$n_neighbors <<- run_knn(input$num)
+        rv$knn_neighbors <<- run_knn(input$num)
       }
       RUN_NEEDED <<- FALSE
       if (WPRESENT) { # remove warning 
@@ -149,12 +159,10 @@ neighborhood_clickable_server <- function(input, output, session) {
   # color plot based on red clicked cell, and blue neighbor cells
   selected = NULL
   observeEvent( input$plot_selected, {
-    
-    str(input$plot_selected)
-
     if (nchar(input$plot_selected) > 4 | RUN_NEEDED) { 
       selected <<- character(0)
       rv$ordered_coords <<- rv$ordered_coords[1:6406, ]
+      rv$d_colors <<- as.list(rep("#ffffff", 10))
       
       # add warning
       if (!WPRESENT & RUN_NEEDED) { 
@@ -181,6 +189,7 @@ neighborhood_clickable_server <- function(input, output, session) {
       }
 
       if (nrow(rv$neighbor_data) > 0 & ncol(rv$neighbor_data) > 1) {
+        rv$d_colors <<- deca_colors(rv$neighbor_data)
         neighbor_coords <- cbind(
           rv$neighbor_data[, c("Global_x", "Global_y")], 
           status = rep("neighbor", nrow(rv$neighbor_data))
@@ -200,31 +209,37 @@ neighborhood_clickable_server <- function(input, output, session) {
   # plot decagons of cluster cell types 
   output$decagons <- renderPlot({
     plot = ggplot(decagons)
-    
-    if (nrow(rv$neighbor_data) > 0) {
-      my_colors = deca_colors(rv$neighbor_data)
-      
-      for (i in 1:10) {
-        indxes = which(decagons$name == as.character(i))
-        plot <- plot + geom_polygon(
-          data = decagons[indxes, ], aes(x = x, y = y),
-          fill = my_colors[[i]],
-          color = "black", linewidth = 1.25
-        )
-      }
-      
-      plot <- plot + 
-        coord_fixed() + 
-        theme_bw() + 
-        theme(
-          axis.text = element_blank(),
-          axis.title = element_blank(),
-          axis.ticks = element_blank(), 
-          panel.border = element_blank(),
-          panel.grid = element_blank()
-        )
+    for (i in 1:10) {
+      indxes = which(decagons$name == as.character(i))
+      plot <- plot + geom_polygon(
+        data = decagons[indxes, ], aes(x = x, y = y),
+        fill = rv$d_colors[[i]],
+        color = "black", linewidth = 1.25
+      )
     }
+    plot <- plot + 
+      coord_fixed() + 
+      theme_deca()
     return(plot)
+  })
+  
+  output$deca_key <- renderPlot({
+    colors = unique(unlist(rv$d_colors))
+    types = sapply(colors, function(x) { as.numeric(which(summertime_pal == x)) })
+    types <- names(summertime_pal)[types]
+
+    df = data.frame(x = c(1:length(colors)))
+    plot = ggplot(df, aes(x = x, y = 1, col = as.factor(x))) + 
+      geom_point() + 
+      scale_color_manual(values = colors, labels = types, name = "Population") +
+      theme_bw() + 
+      theme(
+        legend.title = element_text(size = 14.5, lineheight = 1.3),
+        legend.text = element_text(size = 14.5, lineheight = 1.3),
+        legend.justification = "left"
+      )
+    legend = get_legend(plot)
+    return(grid.draw(legend))
   })
   
 }
