@@ -91,6 +91,32 @@ h3 {
   margin-right: 12px;
 }
 
+/* -- Step 7: Population Id -- */
+#pop_click_col {
+  padding-right: 0px;
+}
+#pop_boxes_col {
+  padding-left: 0px;
+  padding-right: 0px;
+  height: 500px;
+}
+#pop_clickable-visible_pops span {
+  display: none;  
+}
+#pop_clickable-visible_pops div.shiny-options-group {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-42%); 
+}
+#pop_clickable-visible_pops div.checkbox {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  height: 24px;
+}
+#pop_clickable-visible_pops div.checkbox input {
+  margin-top: 0px;
+}
+
 /* -- Step 8: Neighborhood Analysis -- */ 
 #decagons_col {
   padding-right: 0px;
