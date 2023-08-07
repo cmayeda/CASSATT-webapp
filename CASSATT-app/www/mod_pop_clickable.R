@@ -2,27 +2,29 @@ pop_clickable_ui <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(
-      column(10, offset = 1,
+      column(6,
+        girafeOutput(ns("plot"))
+      ),
+      column(6,
         fluidRow(
-          column(7,
-            girafeOutput(ns("plot"))
-          ),
-          column(5, 
-              tags$div(class = "config_menu",
-                  selectInput(ns("method"),
-                      label = "Method of population identification",
-                      choices = c("expert gating", "kmeans clustering"),
-                      selected = "expert gating"),
-              ),
+          column(6, 
+            tags$div(class = "config_menu",
+              selectInput(ns("method"),
+                          label = "Method of population identification",
+                          choices = c("expert gating", "kmeans clustering"),
+                          selected = "expert gating"),
+              )
+            ),
+            column(6, 
               tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
               nec tellus imperdiet, mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. 
               Etiam ac turpis bibendum, fermentum enim vitae, feugiat nulla. Morbi pharetra euismod dictum. 
-              Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.")    
+              Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.") 
+            )
           )
-        ),
+        )
       )
     )
-  )
 }
 
 pop_clickable_server <- function(id, server_rv) {

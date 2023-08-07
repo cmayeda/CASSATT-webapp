@@ -14,6 +14,20 @@ theme_clickable <- function() {
   )
 }
 
+theme_deca <- function() {
+  theme_bw() %+replace%
+    theme(
+      axis.text = element_blank(),
+      axis.title = element_blank(),
+      axis.ticks = element_blank(), 
+      axis.ticks.length = unit(0, "null"), 
+      # axis.ticks.margin = unit(0, "null"), depreciated? 
+      panel.border = element_blank(),
+      panel.grid = element_blank(),
+      plot.margin = unit(c(0,0,0,0), "null"),
+    )
+}
+
 # CASSATT Summertime for Step 7 
 summertime_pal = c(
   "Tumor A" = "#3d3456",
@@ -28,8 +42,10 @@ summertime_pal = c(
   "Microglia A" = "#354953",
   "Microglia B" = "#1d2b22",
   "Macrophage A" = "#d06a24",
-  "Macrophage B" = "#9e4200"
+  "Macrophage B" = "#9e4200",
+  "None" = "#ffffff"
 )
+
 summertime_expanded = c(
   "#474278","#3d3456","#75647a",
   "#971a00","#702512","#4b220a",
@@ -46,7 +62,7 @@ names(summertime_expanded) <- as.character(0:14)
 library(viridisLite)
 set.seed(5)
 viridis_expert = sample(viridis(13))
-names(viridis_expert) <- names(summertime_pal)
+names(viridis_expert) <- names(summertime_pal)[1:13]
 
 viridis_kmeans = sample(viridis(15))
 names(viridis_kmeans) <- as.character(0:14)
