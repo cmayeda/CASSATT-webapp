@@ -98,6 +98,8 @@ pop_clickable_server <- function(id, server_rv) {
       
       # remove a population, keep a blank row for legend 
       rm = setdiff(rv$visible, input$visible_pops)
+      str(rm)
+      
       if (length(rm) > 0) { 
         indxs = which(rv$ordered_data[, rv$col] == rm)
         blank_row = as.data.frame(matrix(ncol = 18))
@@ -114,9 +116,13 @@ pop_clickable_server <- function(id, server_rv) {
         # set color to white 
         rv$pal[rm] <<- "#ffffff"
         
-        # unselect in key 
-        if (rm == selected) {
-          selected <<- character(0)
+        # unselect in key
+        str(selected)
+        
+        if (length(selected) > 0) {
+          if (rm == selected) {
+            selected <<- character(0)
+          }
         }
       }
        
@@ -133,7 +139,11 @@ pop_clickable_server <- function(id, server_rv) {
         rv$breaks <<- c(ad, br_step)
         
         # replace color 
-        rv$pal[ad] <<- summertime_pal[ad]
+        if (server_rv$colormode == "custom") {
+          rv$pal[ad] <<- summertime_pal[ad]
+        } else {
+          rv$pal[ad] <<- viridis_expert[ad]
+        }
         
         # select in key and on plot
         selected <<- ad
@@ -170,7 +180,7 @@ pop_clickable_server <- function(id, server_rv) {
     })
     
     # reorder plot data with clicked population on top 
-    selected = NULL
+    selected = character(0)
     
     observeEvent( input$plot_key_selected, {
       if (!is.null(input$plot_key_selected)) {
