@@ -62,7 +62,8 @@ names(summertime_expanded) <- as.character(0:14)
 library(viridisLite)
 set.seed(5)
 viridis_expert = sample(viridis(13))
-names(viridis_expert) <- names(summertime_pal)[1:13]
+viridis_expert <- append(viridis_expert, "#ffffff")
+names(viridis_expert) <- names(summertime_pal)
 
 viridis_kmeans = sample(viridis(15))
 names(viridis_kmeans) <- as.character(0:14)

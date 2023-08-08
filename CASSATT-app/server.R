@@ -40,6 +40,6 @@ shinyServer(function(input, output, session) {
   pop_clickable_server("pop_clickable", rv)
   
   # -- 7: Neighborhood ID & Analysis -- 
-  callModule(neighborhood_clickable_server, "neighborhood_clickable")
+  callModule(neighborhood_clickable_server, "neighborhood_clickable", rv)
 
 })
