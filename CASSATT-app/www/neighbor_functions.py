@@ -35,7 +35,7 @@ viridis_colors = {
   "CD8T.B" : "#287C8EFF",
   "DNT.A" : "#433A83FF",
   "DNT.B" : "#21908CFF",
-  "Microglia.A" : "#FDE732FF",
+  "Microglia.A" : "#FDE725FF",
   "Microglia.B" : "#3B528BFF",
   "Macrophage.A" : "#440054FF",
   "Macrophage.B" : "#20A486FF"

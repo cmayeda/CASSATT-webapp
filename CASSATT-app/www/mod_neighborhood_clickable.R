@@ -64,7 +64,8 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
                        knn_neighbors = data.frame(), 
                        s_neighbors = data.frame(),
                        neighbor_data = data.frame(),
-                       d_colors = as.list(rep("#ffffff", 10)))
+                       d_colors = as.list(rep("#ffffff", 10)),
+                       deca_key = NULL)
   
   fill_click = "#fbb700"
   fill_hover = "#ddcca1"
@@ -114,10 +115,11 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
       hideElement("run")
     }
     
-    # wipe plot on method change
+    # wipe output on method change
     gc()
     rv$ordered_coords <<- isolate(rv$ordered_coords[1:6406, ])
     selected <<- character(0)
+    rv$d_colors <<- as.list(rep("#ffffff", 10))
   })
   
   # set up warnings 
@@ -191,6 +193,15 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
     }
   }, ignoreInit = TRUE, ignoreNULL = TRUE)
   
+  # on colormode change, get new colors 
+  observeEvent( server_rv$colormode, {
+    if (nrow(rv$neighbor_data) > 0) {
+      rv$d_colors <<- deca_colors(rv$neighbor_data, server_rv$colormode)
+    } else {
+      rv$d_colors <<- as.list(rep("#ffffff", 10))
+    }
+  }, ignoreInit = TRUE) 
+  
   # after reordering plot, re-select clicked population 
   session$onFlushed(function() {
     session$sendCustomMessage(type = "neighborhood_clickable-plot_set", message = selected)
@@ -213,34 +224,29 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
     return(plot)
   })
   
-  output$deca_key <- renderPlot({
+  observeEvent( rv$d_colors, {
     colors = unique(unlist(rv$d_colors))
-    
-    if (server_rv$colormode == "custom") {
+    if (server_rv$colormode == "custom") { 
       types = sapply(colors, function(x) { as.numeric(which(summertime_pal == x)) })
       types <- names(summertime_pal)[types]
     } else {
       types = sapply(colors, function(x) { as.numeric(which(viridis_expert == x)) })
-      cat(paste(types), "\n")
-      
       types <- names(viridis_expert)[types]
-      
-      cat(paste(types), "\n")
     }
-
     df = data.frame(x = c(1:length(colors)))
-    plot = ggplot(df, aes(x = x, y = 1, col = as.factor(x))) + 
-      geom_point() + 
+    plot = ggplot(df, aes(x = x, y = 1, col = as.factor(x))) +
+      geom_point() +
       scale_color_manual(values = colors, labels = types, name = "Population") +
-      theme_bw() + 
+      theme_bw() +
       theme(
         legend.title = element_text(size = 14.5, lineheight = 1.3),
         legend.text = element_text(size = 14.5, lineheight = 1.3),
         legend.justification = "left"
       )
-    legend = get_legend(plot)
-    return(grid.draw(legend))
-  })
+    rv$deca_key <<- get_legend(plot)
+  }, ignoreInit = FALSE)
+  
+  output$deca_key <- renderPlot({ grid.draw(rv$deca_key) })
   
 }
 

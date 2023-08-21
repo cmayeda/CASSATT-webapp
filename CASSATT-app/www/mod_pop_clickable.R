@@ -98,7 +98,7 @@ pop_clickable_server <- function(id, server_rv) {
       
       # remove a population, keep a blank row for legend 
       rm = setdiff(rv$visible, input$visible_pops)
-      str(rm)
+      # str(rm)
       
       if (length(rm) > 0) { 
         indxs = which(rv$ordered_data[, rv$col] == rm)
@@ -117,7 +117,7 @@ pop_clickable_server <- function(id, server_rv) {
         rv$pal[rm] <<- "#ffffff"
         
         # unselect in key
-        str(selected)
+        # str(selected)
         
         if (length(selected) > 0) {
           if (rm == selected) {
