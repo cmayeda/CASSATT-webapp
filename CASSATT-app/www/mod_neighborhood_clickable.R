@@ -12,19 +12,13 @@
 library(cowplot)
 library(grid)
 library(gridExtra)
-
-neighborhood_data = read.csv("www/neighborhood_data.csv")
-# py$neighborhood_data <- neighborhood_data
-r_to_py(neighborhood_data)
-
-coords = neighborhood_data[, c("Global_x","Global_y")]
-status = c(rep("unselected", nrow(coords)))
-# py$vor_pops <- as.list(summertime_pal)
-# r_to_py(as.list(summertime_pal))
+source_python("www/neighbor_functions.py")
 
 decagons = read.csv("www/decagons.csv")
-
-source_python("www/neighbor_functions.py")
+neighborhood_data = read.csv("www/neighborhood_data.csv")
+r_to_py(neighborhood_data)
+coords = neighborhood_data[, c("Global_x","Global_y")]
+status = c(rep("unselected", nrow(coords)))
 
 neighborhood_clickable_ui <- function(id) {
   ns <- NS(id)
@@ -64,11 +58,7 @@ neighborhood_clickable_ui <- function(id) {
   )
 }
 
-
-
-
-
-neighborhood_clickable_server <- function(input, output, session) {
+neighborhood_clickable_server <- function(input, output, session, server_rv) {
   
   rv <- reactiveValues(ordered_coords = as.data.frame(cbind(coords, status)),
                        knn_neighbors = data.frame(), 
@@ -189,7 +179,7 @@ neighborhood_clickable_server <- function(input, output, session) {
       }
 
       if (nrow(rv$neighbor_data) > 0 & ncol(rv$neighbor_data) > 1) {
-        rv$d_colors <<- deca_colors(rv$neighbor_data)
+        rv$d_colors <<- deca_colors(rv$neighbor_data, server_rv$colormode)
         neighbor_coords <- cbind(
           rv$neighbor_data[, c("Global_x", "Global_y")], 
           status = rep("neighbor", nrow(rv$neighbor_data))
@@ -225,8 +215,18 @@ neighborhood_clickable_server <- function(input, output, session) {
   
   output$deca_key <- renderPlot({
     colors = unique(unlist(rv$d_colors))
-    types = sapply(colors, function(x) { as.numeric(which(summertime_pal == x)) })
-    types <- names(summertime_pal)[types]
+    
+    if (server_rv$colormode == "custom") {
+      types = sapply(colors, function(x) { as.numeric(which(summertime_pal == x)) })
+      types <- names(summertime_pal)[types]
+    } else {
+      types = sapply(colors, function(x) { as.numeric(which(viridis_expert == x)) })
+      cat(paste(types), "\n")
+      
+      types <- names(viridis_expert)[types]
+      
+      cat(paste(types), "\n")
+    }
 
     df = data.frame(x = c(1:length(colors)))
     plot = ggplot(df, aes(x = x, y = 1, col = as.factor(x))) + 

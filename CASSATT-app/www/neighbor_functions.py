@@ -25,6 +25,22 @@ pop_colors = {
   "Macrophage.B" : "#9e4200"
 }
 
+viridis_colors = {
+  "Tumor.A" : "#481F70FF",
+  "Tumor.B" : "#8FD744FF",
+  "CD4T.A" : "#35B779FF",
+  "CD4T.B" : "#C7E02EFF",
+  "CD4T.C" : "#5EC863FF",
+  "CD8T.A" : "#31688EFF",
+  "CD8T.B" : "#287C8EFF",
+  "DNT.A" : "#433A83FF",
+  "DNT.B" : "#21908CFF",
+  "Microglia.A" : "#FDE732FF",
+  "Microglia.B" : "#3B528BFF",
+  "Macrophage.A" : "#440054FF",
+  "Macrophage.B" : "#20A486FF"
+}
+
 def find_voronoi(input_cell):
   input_x = np.asarray(input_cell["Global_x"])
   input_cell_indx = np.intersect1d(vor.points[:, 0], input_x, return_indices = True)[1]
@@ -101,7 +117,7 @@ def find_knn(knn_neighbors, input_cell):
   neighbor_data = neighborhood_data.iloc[neighbor_indexes]
   return(neighbor_data)
   
-def deca_colors(neighbor_data): 
+def deca_colors(neighbor_data, colormode): 
   rounded = neighbor_data.iloc[:, 0:14].mean()
   rounded = pd.DataFrame(rounded[1:])
   rounded['dec'] = rounded.apply(lambda x: np.floor(x*10))
@@ -113,6 +129,11 @@ def deca_colors(neighbor_data):
   rounded = rounded.sort_values(by = ['dec'], ascending = False)
   for_dec = rounded[rounded.dec != 0].reset_index()
 
+  if colormode == "custom":
+    color_dict = pop_colors
+  elif colormode == "viridis":
+    color_dict = viridis_colors
+
   d_dec = {}
   for index, row in for_dec.iterrows():
       d_dec[row['index']] = row['dec']
@@ -121,7 +142,7 @@ def deca_colors(neighbor_data):
   for key, val in d_dec.items():
       count = val
       while count > 0:
-          d_turtle[count2] = pop_colors[key]
+          d_turtle[count2] = color_dict[key]
           count -= 1
           count2 +=1
       else:
