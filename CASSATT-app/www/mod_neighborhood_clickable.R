@@ -92,12 +92,6 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
     girafe(ggobj = gg, options = gir_options) 
   })
   
-  # run shell & knn once on load 
-  observeEvent( input$run, {
-    rv$s_neighbors <<- run_shell(70)
-    rv$knn_neighbors <<- run_knn(10)
-  }, ignoreNULL = FALSE, ignoreInit = FALSE, once = TRUE)
-  
   # hide and show controls based on neighbor ID method
   observe({
     if (input$method == "knn") {
