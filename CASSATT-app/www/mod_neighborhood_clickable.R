@@ -58,12 +58,18 @@ neighborhood_clickable_ui <- function(id) {
   )
 }
 
+empty_row = data.frame(
+  "Global_x" = numeric(),
+  "Global_y" = numeric(),
+  "orig_indx" = numeric()
+)
+
 neighborhood_clickable_server <- function(input, output, session, server_rv) {
   
-  rv <- reactiveValues(ordered_coords = as.data.frame(cbind(coords, status)),
+  rv <- reactiveValues(selected_point = empty_row,
+                       selected_neighbors = empty_row, 
                        knn_neighbors = data.frame(), 
                        s_neighbors = data.frame(),
-                       neighbor_data = data.frame(),
                        d_colors = as.list(rep("#ffffff", 10)),
                        deca_key = NULL)
   
@@ -78,14 +84,21 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
   )
   
   output$plot <- renderGirafe({
-    gg = ggplot(rv$ordered_coords) +
-      geom_point_interactive(aes(
-        x = Global_x, y = Global_y,
-        col = status, 
-        tooltip = NULL, 
-        data_id = rownames(rv$ordered_coords),
-      ), cex = dot_size) +
-      scale_color_manual(values = neighbor_palette, name = "Status") + 
+    gg = ggplot() +
+      geom_point_interactive(
+        data = neighborhood_data, 
+        cex = dot_size, col = "lightgray", 
+        aes(x = Global_x, y = Global_y, data_id = rownames(neighborhood_data))
+      ) +
+      geom_point_interactive(
+        data = rv$selected_neighbors, cex = dot_size, col = "#41657c", 
+        aes(x = Global_x, y = Global_y, data_id = orig_indx)
+      ) +
+      geom_point_interactive(
+        data = rv$selected_point, cex = dot_size, col = "#fbb700", 
+        aes(x = Global_x, y = Global_y, data_id = orig_indx)
+      ) +
+      # scale_color_manual(values = neighbor_palette, name = "Status") + 
       coord_fixed() + 
       scale_y_reverse() +
       theme_clickable()
@@ -143,15 +156,13 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
   })
   
   # color plot based on red clicked cell, and blue neighbor cells
-  selected = NULL
+  selected = NULL 
   observeEvent( input$plot_selected, {
-    if (nchar(input$plot_selected) > 4 | RUN_NEEDED) { 
-      selected <<- character(0)
-      rv$ordered_coords <<- rv$ordered_coords[1:6406, ]
-      rv$d_colors <<- as.list(rep("#ffffff", 10))
-      
-      # add warning
-      if (!WPRESENT & RUN_NEEDED) { 
+    if (is.null(input$plot_selected) | RUN_NEEDED) { 
+      rv$selected_point <<- empty_row
+      rv$selected_neighbors <<- empty_row
+      selected <<- NULL
+      if (RUN_NEEDED & !WPRESENT) {
         if (input$method == "shell") {
           insertUI(selector = "#warning",
             ui = tags$h5(id = "s_warning", "Warning: shell neighbors has not been run for this distance."))
@@ -163,82 +174,91 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
       }
     } else {
       selected <<- input$plot_selected
-      selected_row = rv$ordered_coords[as.numeric(selected), ]
-      selected_row$status <- "selected"
+      orig_indx = as.numeric(input$plot_selected)
+      c = neighborhood_data[orig_indx, c("Global_x","Global_y")]
+      rv$selected_point <<- cbind(c, orig_indx)
       
+      neighbors = data.frame()
       if (input$method == "voronoi") {
-        rv$neighbor_data <<- find_voronoi(selected_row) 
+        neighbors <- find_voronoi(rv$selected_point)
       } else if (input$method == "shell") {
-        rv$neighbor_data <- find_shell(rv$s_neighbors, selected_row) 
-      } else if (input$method == "knn") {
-        rv$neighbor_data <- find_knn(rv$knn_neighbors, selected_row)
+        neighbors <- find_shell(rv$s_neighbors, rv$selected_point)
+      } else if (input$method == "knn") { 
+        neighbors <- find_knn(rv$knn_neighbors, rv$selected_point)
       }
-
-      if (nrow(rv$neighbor_data) > 0 & ncol(rv$neighbor_data) > 1) {
-        rv$d_colors <<- deca_colors(rv$neighbor_data, server_rv$colormode)
-        neighbor_coords <- cbind(
-          rv$neighbor_data[, c("Global_x", "Global_y")], 
-          status = rep("neighbor", nrow(rv$neighbor_data))
-        )
-        rv$ordered_coords <<- rbind(rv$ordered_coords[1:6406, ], neighbor_coords, selected_row)
-      } else {
-        rv$ordered_coords <<- isolate(rv$ordered_coords[1:6406, ])
+      
+      # retrieve r indx from py attribute
+      indx_att = attributes(neighbors)[["pandas.index"]]
+      r_indx = c()
+      for (i in 1:length(indx_att)) {
+        r_indx[i] <- as.numeric(paste(indx_att[i - 1])) + 1
       }
+      rv$selected_neighbors <<- cbind(neighbors, orig_indx = r_indx)
     }
-  }, ignoreInit = TRUE, ignoreNULL = TRUE)
-  
-  # on colormode change, get new colors 
-  observeEvent( server_rv$colormode, {
-    if (nrow(rv$neighbor_data) > 0) {
-      rv$d_colors <<- deca_colors(rv$neighbor_data, server_rv$colormode)
-    } else {
-      rv$d_colors <<- as.list(rep("#ffffff", 10))
-    }
-  }, ignoreInit = TRUE) 
+  }, ignoreInit = T, ignoreNULL = F)
   
   # after reordering plot, re-select clicked population 
+  # selected cannot be a reactive variable, because session$onFlushed does 
+  # not register as a reactive environment 
   session$onFlushed(function() {
     session$sendCustomMessage(type = "neighborhood_clickable-plot_set", message = selected)
   }, once = FALSE)
   
-  # plot decagons of cluster cell types 
-  output$decagons <- renderPlot({
-    plot = ggplot(decagons)
-    for (i in 1:10) {
-      indxes = which(decagons$name == as.character(i))
-      plot <- plot + geom_polygon(
-        data = decagons[indxes, ], aes(x = x, y = y),
-        fill = rv$d_colors[[i]],
-        color = "black", linewidth = 1.25
-      )
-    }
-    plot <- plot + 
-      coord_fixed() + 
-      theme_deca()
-    return(plot)
-  })
-  
-  observeEvent( rv$d_colors, {
-    colors = unique(unlist(rv$d_colors))
-    if (server_rv$colormode == "custom") { 
-      types = sapply(colors, function(x) { as.numeric(which(summertime_pal == x)) })
-      types <- names(summertime_pal)[types]
+  # on colormode change, get new colors 
+  observeEvent( server_rv$colormode, {
+    if (nrow(rv$selected_neighbors) > 0) {
+      rv$d_colors <<- deca_colors(rv$selected_neighbors, server_rv$colormode)
     } else {
-      types = sapply(colors, function(x) { as.numeric(which(viridis_expert == x)) })
-      types <- names(viridis_expert)[types]
+      rv$d_colors <<- as.list(rep("#ffffff", 10))
     }
-    df = data.frame(x = c(1:length(colors)))
-    plot = ggplot(df, aes(x = x, y = 1, col = as.factor(x))) +
-      geom_point() +
-      scale_color_manual(values = colors, labels = types, name = "Population") +
-      theme_bw() +
-      theme(
-        legend.title = element_text(size = 14.5, lineheight = 1.3),
-        legend.text = element_text(size = 14.5, lineheight = 1.3),
-        legend.justification = "left"
-      )
-    rv$deca_key <<- get_legend(plot)
-  }, ignoreInit = FALSE)
+  }, ignoreInit = T) 
+  
+  # plot decagons of cluster cell types 
+  # observeEvent(rv$selected_neighbors, {
+  #   if (nrow(rv$selected_neighbors) >= 1) {
+  #     rv$d_colors <<- deca_colors(rv$selected_neighbors, server_rv$colormode)
+  #   } else {
+  #     rv$d_colors <<- as.list(rep("#ffffff", 10))
+  #   }
+  # }, ignoreInit = T)
+  
+  # output$decagons <- renderPlot({
+  #   plot = ggplot(decagons)
+  #   for (i in 1:10) {
+  #     indxes = which(decagons$name == as.character(i))
+  #     plot <- plot + geom_polygon(
+  #       data = decagons[indxes, ], aes(x = x, y = y),
+  #       fill = rv$d_colors[[i]],
+  #       color = "black", linewidth = 1.25
+  #     )
+  #   }
+  #   plot <- plot + 
+  #     coord_fixed() + 
+  #     theme_deca()
+  #   return(plot)
+  # })
+  
+  # observeEvent( rv$d_colors, {
+  #   colors = unique(unlist(rv$d_colors))
+  #   if (server_rv$colormode == "custom") { 
+  #     types = sapply(colors, function(x) { as.numeric(which(summertime_pal == x)) })
+  #     types <- names(summertime_pal)[types]
+  #   } else {
+  #     types = sapply(colors, function(x) { as.numeric(which(viridis_expert == x)) })
+  #     types <- names(viridis_expert)[types]
+  #   }
+  #   df = data.frame(x = c(1:length(colors)))
+  #   plot = ggplot(df, aes(x = x, y = 1, col = as.factor(x))) +
+  #     geom_point() +
+  #     scale_color_manual(values = colors, labels = types, name = "Population") +
+  #     theme_bw() +
+  #     theme(
+  #       legend.title = element_text(size = 14.5, lineheight = 1.3),
+  #       legend.text = element_text(size = 14.5, lineheight = 1.3),
+  #       legend.justification = "left"
+  #     )
+  #   rv$deca_key <<- get_legend(plot)
+  # }, ignoreInit = FALSE)
   
   output$deca_key <- renderPlot({ grid.draw(rv$deca_key) })
   

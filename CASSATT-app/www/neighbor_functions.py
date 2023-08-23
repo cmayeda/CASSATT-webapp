@@ -7,7 +7,7 @@ neighborhood_data = pd.read_csv("www/neighborhood_data.csv")
 coords = neighborhood_data[["Global_x", "Global_y"]]
 coords_array = np.asarray(coords)
 coords_gsp = GriSPy(coords_array)
-vor = Voronoi(np.asarray(coords))
+vor = Voronoi(coords_array)
 
 pop_colors = {
   "Tumor.A" : "#3d3456",
@@ -45,7 +45,7 @@ def find_voronoi(input_cell):
   input_x = np.asarray(input_cell["Global_x"])
   input_cell_indx = np.intersect1d(vor.points[:, 0], input_x, return_indices = True)[1]
   input_region = vor.regions[int(vor.point_region[input_cell_indx])] # list of vertices indexes
-
+ 
   # find regions that share a vertices with input_region
   neighbor_region_indx = []
   for vert in input_region:
