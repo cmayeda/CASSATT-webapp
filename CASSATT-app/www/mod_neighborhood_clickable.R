@@ -98,7 +98,6 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
         data = rv$selected_point, cex = dot_size, col = "#fbb700", 
         aes(x = Global_x, y = Global_y, data_id = orig_indx)
       ) +
-      # scale_color_manual(values = neighbor_palette, name = "Status") + 
       coord_fixed() + 
       scale_y_reverse() +
       theme_clickable()
@@ -124,16 +123,10 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
     }
     
     # wipe output on method change
-    clear_selections()
-  })
-  
-  clear_selections <- reactive({
-    rv$selected_point
-    
     selected <<- character(0)
     rv$selected_point <<- empty_row
     rv$selected_neighbors <<- empty_row
-  })
+  }, ignoreInit = T)
   
   # set up warnings 
   RUN_NEEDED = FALSE
@@ -146,7 +139,8 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
   observeEvent( input$run, {
     if (isTruthy(input$num) & RUN_NEEDED) {
       selected <<- character(0)
-      rv$ordered_coords <<- rv$ordered_coords[1:6406, ]
+      rv$selected_point <<- empty_row
+      rv$selected_neighbors <<- empty_row
       
       if (input$method == "shell") {
         rv$s_neighbors <<- run_shell(input$num)
@@ -165,10 +159,14 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
   selected = NULL 
   observeEvent( input$plot_selected, {
     if (is.null(input$plot_selected)) { 
-      clear_selections()
+      selected <<- character(0)
+      rv$selected_point <<- empty_row
+      rv$selected_neighbors <<- empty_row
     } else {
       if (RUN_NEEDED) {
-        clear_selections()
+        selected <<- character(0)
+        rv$selected_point <<- empty_row
+        rv$selected_neighbors <<- empty_row
         if (!WPRESENT & input$method == "shell") {
           insertUI(
             selector = "#warning",
