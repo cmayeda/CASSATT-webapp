@@ -106,7 +106,7 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
   })
   
   # hide and show controls based on neighbor ID method
-  observe({
+  observeEvent( input$method, {
     if (input$method == "knn") {
       updateNumericInput(session, "num", label = "Number of nearest neighbors", value = 10, min = 5, max = 30)
       updateActionButton(session, "run", label = "Calculate nearest neighbors")
@@ -123,10 +123,16 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
     }
     
     # wipe output on method change
-    gc()
-    rv$ordered_coords <<- isolate(rv$ordered_coords[1:6406, ])
+    clear_selections()
+  })
+  
+  clear_selections <- reactive({
+    rv$selected_point
+    
     selected <<- character(0)
-    rv$d_colors <<- as.list(rep("#ffffff", 10))
+    rv$selected_point <<- empty_row
+    rv$selected_neighbors <<- empty_row
+    # rv$d_colors <<- as.list(rep("#ffffff", 10))
   })
   
   # set up warnings 
@@ -158,48 +164,53 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
   # color plot based on red clicked cell, and blue neighbor cells
   selected = NULL 
   observeEvent( input$plot_selected, {
-    if (is.null(input$plot_selected) | RUN_NEEDED) { 
-      rv$selected_point <<- empty_row
-      rv$selected_neighbors <<- empty_row
-      selected <<- NULL
-      if (RUN_NEEDED & !WPRESENT) {
-        if (input$method == "shell") {
-          insertUI(selector = "#warning",
-            ui = tags$h5(id = "s_warning", "Warning: shell neighbors has not been run for this distance."))
-        } else {
-          insertUI(selector = "#warning",
-            ui = tags$h5(id = "k_warning", "Warning: knn neighbors has not been run for this k value"))
-        }
-        WPRESENT <<- TRUE
-      }
+    if (is.null(input$plot_selected)) { 
+      clear_selections()
     } else {
-      selected <<- input$plot_selected
-      orig_indx = as.numeric(input$plot_selected)
-      c = neighborhood_data[orig_indx, c("Global_x","Global_y")]
-      rv$selected_point <<- cbind(c, orig_indx)
-      
-      neighbors = data.frame()
-      if (input$method == "voronoi") {
-        neighbors <- find_voronoi(rv$selected_point)
-      } else if (input$method == "shell") {
-        neighbors <- find_shell(rv$s_neighbors, rv$selected_point)
-      } else if (input$method == "knn") { 
-        neighbors <- find_knn(rv$knn_neighbors, rv$selected_point)
+      if (RUN_NEEDED) {
+        clear_selections()
+        if (!WPRESENT & input$method == "shell") {
+          insertUI(
+            selector = "#warning",
+            ui = tags$h5(id = "s_warning", "Warning: shell neighbors has not been run for this distance.")
+          )
+          WPRESENT <<- TRUE
+        } else if (!WPRESENT & input$method == "knn") {
+          insertUI(
+            selector = "#warning",
+            ui = tags$h5(id = "k_warning", "Warning: knn neighbors has not been run for this k value")
+          )
+          WPRESENT <<- TRUE
+        }
+      } else {
+        selected <<- input$plot_selected
+        orig_indx = as.numeric(input$plot_selected)
+        c = neighborhood_data[orig_indx, c("Global_x","Global_y")]
+        rv$selected_point <<- cbind(c, orig_indx)
+        
+        neighbors = data.frame()
+        if (input$method == "voronoi") {
+          neighbors <- find_voronoi(rv$selected_point)
+        } else if (input$method == "shell") {
+          neighbors <- find_shell(rv$s_neighbors, rv$selected_point)
+        } else if (input$method == "knn") { 
+          neighbors <- find_knn(rv$knn_neighbors, rv$selected_point)
+        }
+        
+        # retrieve r indx from py attribute
+        indx_att = attributes(neighbors)[["pandas.index"]]
+        r_indx = c()
+        for (i in 1:length(indx_att)) {
+          r_indx[i] <- as.numeric(paste(indx_att[i - 1])) + 1
+        }
+        rv$selected_neighbors <<- cbind(neighbors, orig_indx = r_indx)
       }
-      
-      # retrieve r indx from py attribute
-      indx_att = attributes(neighbors)[["pandas.index"]]
-      r_indx = c()
-      for (i in 1:length(indx_att)) {
-        r_indx[i] <- as.numeric(paste(indx_att[i - 1])) + 1
-      }
-      rv$selected_neighbors <<- cbind(neighbors, orig_indx = r_indx)
     }
   }, ignoreInit = T, ignoreNULL = F)
   
   # after reordering plot, re-select clicked population 
-  # selected cannot be a reactive variable, because session$onFlushed does 
-  # not register as a reactive environment 
+  # selected cannot be a reactive variable, because 
+  # session$onFlushed is not reactive
   session$onFlushed(function() {
     session$sendCustomMessage(type = "neighborhood_clickable-plot_set", message = selected)
   }, once = FALSE)
