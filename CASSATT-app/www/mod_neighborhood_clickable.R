@@ -25,9 +25,9 @@ neighborhood_clickable_ui <- function(id) {
   tagList(
     fluidRow(
       column(6,
-        girafeOutput(ns("plot"))
+        girafeOutput(ns("plot"), width = "97.06%")
       ),
-      column(6, 
+      column(5, offset = 1, 
         fluidRow(
           column(6, 
             tags$div(class = "config_menu",
@@ -45,7 +45,7 @@ neighborhood_clickable_ui <- function(id) {
           )
         ),
         fluidRow(
-          tags$h5("Decagon visualization"), 
+          column(12, tags$h5("Decagon visualization")),
           column(4, id = "decagons_col", 
             plotOutput(ns("decagons"), height = "200px")
           ),
