@@ -295,6 +295,16 @@ shinyUI(fluidPage(
           tags$h3("Step 8: Neighborhood Identification & Analysis")
       )
   ),
-  neighborhood_clickable_ui("neighborhood_clickable")
+  neighborhood_clickable_ui("neighborhood_clickable"), 
 
+  # -- Footer -- 
+  fluidRow(id = "footer", 
+    column(10, offset = 1, 
+      tags$p("© Copyright 2023 by Cass Mayeda, Asa Brockman, Rebecca Ihrie, and Jonathan Irish. All Rights Reserved."),
+      tags$p("The CASSATT analysis pipeline is named after the American painter Mary Cassatt. The color palettes used on 
+             web page are inspired by her works, in particular ", 
+             tags$span(style="font-style:italic","Woman with a Pearl Necklace in a Loge"), 
+             " and ", tags$span(style="font-style:italic", "Summertime"), ".")
+    )
+  )
 ))
