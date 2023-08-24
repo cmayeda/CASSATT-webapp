@@ -32,9 +32,10 @@ theme_deca <- function() {
 summertime_pal = c(
   "Tumor A" = "#3d3456",
   "Tumor B" = "#75647a",
-  "CD4T A" = "#971a00",
-  "CD4T B" = "#702512",
-  "CD4T C" = "#4b220a",
+  "CD4T A" = "#662133",
+  "CD4T B" = "#971a00",
+  "CD4T C" = "#702512",
+  "CD4T D" = "#4b220a", 
   "CD8T A" = "#41657c",
   "CD8T B" = "#223d63",
   "DNT A" = "#e6c170",
@@ -61,7 +62,7 @@ names(summertime_expanded) <- as.character(0:14)
 # Viridis palette for Step 7 
 library(viridisLite)
 set.seed(5)
-viridis_expert = sample(viridis(13))
+viridis_expert = sample(viridis(14))
 viridis_expert <- append(viridis_expert, "#ffffff")
 names(viridis_expert) <- names(summertime_pal)
 

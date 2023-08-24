@@ -20,10 +20,13 @@ pop_clickable_ui <- function(id) {
             ),
             column(6, 
               tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
-              nec tellus imperdiet, mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. 
-              Etiam ac turpis bibendum, fermentum enim vitae, feugiat nulla. Morbi pharetra euismod dictum. 
-              Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.") 
+              nec tellus imperdiet, mollis purus non, ornare lectus.") 
             )
+          ),
+          fluidRow(
+            column(12, 
+              imageOutput(ns("percent"), width = "60%")
+            )  
           )
         )
       )
@@ -37,7 +40,8 @@ pop_clickable_server <- function(id, server_rv) {
                          col = "pop_ID",
                          pal = summertime_pal,
                          breaks = names(summertime_pal)[1:13],
-                         visible = names(summertime_pal)[1:13])
+                         visible = names(summertime_pal)[1:13],
+                         percent_asset = "www/assets/pop_fractions_summertime.jpg")
     
     outline_click = "#fbb700"
     outline_hover = "#ddcca1"
@@ -71,8 +75,10 @@ pop_clickable_server <- function(id, server_rv) {
         rv$visible <<- c(0:15)
         if (server_rv$colormode == "custom") { 
           rv$pal <<- summertime_expanded
+          rv$percent_asset <<- "www/assets/clust_fractions_summertime.jpg"
         } else {
           rv$pal <<- viridis_kmeans
+          rv$percent_asset <<- "www/assets/clust_fractions_viridis.jpg"
         }
         rv$breaks <<- as.character(0:15)
       } else {
@@ -80,8 +86,10 @@ pop_clickable_server <- function(id, server_rv) {
         rv$visible <<- names(summertime_pal)[1:13]
         if (server_rv$colormode == "custom") { 
           rv$pal <<- summertime_pal
+          rv$percent_asset <<- "www/assets/pop_fractions_summertime.jpg"
         } else {
           rv$pal <<- viridis_expert
+          rv$percent_asset <<- "www/assets/pop_fractions_viridis.jpg"
         }
         rv$breaks <<- names(summertime_pal)[1:13]
       }
@@ -213,6 +221,9 @@ pop_clickable_server <- function(id, server_rv) {
       session$sendCustomMessage(type = "pop_clickable-plot_set", message = selected)
       session$sendCustomMessage(type = "pop_clickable-plot_key_set", message = selected)
     }, once = FALSE)
+    
+    # Whole slide population / cluster percent of total cells 
+    output$percent <- renderImage({ list(src = rv$percent_asset) }, deleteFile = F)
     
   })
 }
