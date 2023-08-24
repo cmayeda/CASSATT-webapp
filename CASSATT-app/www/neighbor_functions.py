@@ -4,10 +4,9 @@ from scipy.spatial import Voronoi
 from grispy import GriSPy
 
 neighborhood_data = pd.read_csv("www/neighborhood_data.csv")
-coords = neighborhood_data[["Global_x", "Global_y"]]
-coords_array = np.asarray(coords)
-coords_gsp = GriSPy(coords_array)
-vor = Voronoi(np.asarray(coords))
+coords_arr = np.asarray(neighborhood_data[["Global_x", "Global_y"]])
+coords_gsp = GriSPy(coords_arr)
+vor = Voronoi(coords_arr)
 
 pop_colors = {
   "Tumor.A" : "#3d3456",
@@ -35,7 +34,7 @@ viridis_colors = {
   "CD8T.B" : "#287C8EFF",
   "DNT.A" : "#433A83FF",
   "DNT.B" : "#21908CFF",
-  "Microglia.A" : "#FDE732FF",
+  "Microglia.A" : "#FDE725FF",
   "Microglia.B" : "#3B528BFF",
   "Macrophage.A" : "#440054FF",
   "Macrophage.B" : "#20A486FF"
@@ -45,7 +44,7 @@ def find_voronoi(input_cell):
   input_x = np.asarray(input_cell["Global_x"])
   input_cell_indx = np.intersect1d(vor.points[:, 0], input_x, return_indices = True)[1]
   input_region = vor.regions[int(vor.point_region[input_cell_indx])] # list of vertices indexes
-
+ 
   # find regions that share a vertices with input_region
   neighbor_region_indx = []
   for vert in input_region:
@@ -66,7 +65,7 @@ def run_shell(distance):
   upper_radii = float(distance)
   lower_radii = 0.01
   shell_dist, shell_ind = coords_gsp.shell_neighbors(
-       coords_array,
+       coords_arr,
        distance_lower_bound = lower_radii,
        distance_upper_bound = upper_radii
   )
@@ -82,7 +81,7 @@ def find_shell(s_neighbors, input_cell):
 
   # match input cell x and y to coords
   input_x = np.asarray(input_cell["Global_x"])
-  input_cell_indx = np.intersect1d(np.asarray(coords)[:, 0], input_x, return_indices = True)[1]
+  input_cell_indx = np.intersect1d(coords_arr[:, 0], input_x, return_indices = True)[1]
 
   # take indx from coords, use it to find shell dict item
   s_list = list(s_neighbors.values())
@@ -93,7 +92,7 @@ def find_shell(s_neighbors, input_cell):
   
 def run_knn(n_neighbors):
   knn_dist, knn_ind = coords_gsp.nearest_neighbors(
-      coords_array,
+      coords_arr,
       n = int(n_neighbors)
   )
   knn_neighbors = {}
@@ -108,7 +107,7 @@ def find_knn(knn_neighbors, input_cell):
 
   # match input cell x and y to coords
   input_x = np.asarray(input_cell["Global_x"])
-  input_cell_indx = np.intersect1d(np.asarray(coords)[:, 0], input_x, return_indices = True)[1]
+  input_cell_indx = np.intersect1d(coords_arr[:, 0], input_x, return_indices = True)[1]
 
   # take indx from coords, use it to find shell dict item
   knn_list = list(knn_neighbors.values())
