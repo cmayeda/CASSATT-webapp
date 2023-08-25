@@ -157,31 +157,41 @@ def deca_colors(neighbor_data, colormode):
 needed_cols = pop_colors.keys()
 
 def neighborhood_whisker(n_data, colormode):
-  needed = n_data[needed_cols].copy()
-  d = pd.melt(needed)
   
-  # get order of gated populations
-  df_homog = pd.melt(needed).groupby("variable").quantile(0.90)
-  df_homog = df_homog.rename(columns = {"value":"cluster"})
-  df_homog = df_homog.reset_index()
-  order = df_homog.loc[(df_homog.iloc[:, 1:]!=0).any(axis = 1)]['variable'].tolist()[::-1]
-  
-  pal = pop_colors
-  if (colormode == "viridis"):
-    pal = viridis_colors
-  
-  fig = plt.figure(figsize = (len(order)*2, 4))
-  g = sns.boxplot(
-    data = d, x = 'variable', y = 'value',
-    showfliers = False, order = order, palette = pal
-  )
-  g.set(ylim = (0, 1.2))
-  g.tick_params(axis = 'x', labelsize = 16)
-  g.set_xlabel('')
-  g.set_ylabel('Neighbor Frequency', fontsize = 16)
-  plt.tight_layout()
-  plt.savefig('box_whisker.png', dpi = 300)
-  plt.close()
+  if (len(n_data) > 0):
+    needed = n_data[needed_cols].copy()
+    d = pd.melt(needed)
+
+    # get order of gated populations
+    df_homog = pd.melt(needed).groupby("variable").quantile(0.90)
+    df_homog = df_homog.rename(columns = {"value":"cluster"})
+    df_homog = df_homog.reset_index()
+    order = df_homog.loc[(df_homog.iloc[:, 1:]!=0).any(axis = 1)]['variable'].tolist()[::-1]
+
+    pal = pop_colors
+    if (colormode == "viridis"):
+      pal = viridis_colors
+
+    fig = plt.figure(figsize = (len(order)*2, 4))
+    g = sns.boxplot(
+      data = d, x = 'variable', y = 'value',
+      showfliers = False, order = order, palette = pal
+    )
+    g.set(ylim = (0, 1.2))
+    g.tick_params(axis = 'x', labelsize = 16)
+    g.set_xlabel('')
+    g.set_ylabel('Neighbor Frequency', fontsize = 16)
+    plt.tight_layout()
+    plt.savefig('box_whisker.png', dpi = 300)
+    plt.close()
+
+  else:
+    fig = plt.figure()
+    g = sns.boxplot()
+    g.set_ylabel('Neighbor Frequency', fontsize = 16)
+    plt.tight_layout()
+    plt.savefig('box_whisker.png', dpi = 300)
+    plt.close()
   
   
   

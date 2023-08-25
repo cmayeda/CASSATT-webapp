@@ -282,11 +282,9 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
   
   # Box and Whisker Plot 
   output$whisker <- renderImage({
-    if (nrow(rv$selected_neighbors) > 0) {
-      neighborhood_whisker(rv$selected_neighbors, server_rv$colormode)
-      list(src = "box_whisker.png", height = 250, width = 500)
-    }
-  }, deleteFile = F)
+    neighborhood_whisker(rv$selected_neighbors, server_rv$colormode)
+    list(src = "box_whisker.png", height = 250, width = 500)
+  }, deleteFile = T)
   
 }
 
