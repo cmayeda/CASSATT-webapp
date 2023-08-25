@@ -13,9 +13,10 @@ vor = Voronoi(coords_arr)
 pop_colors = {
   "Tumor.A" : "#3d3456",
   "Tumor.B" : "#75647a",
-  "CD4T.A" : "#971a00",
-  "CD4T.B" : "#702512",
-  "CD4T.C" : "#4b220a",
+  "CD4T.A" : "#662133",
+  "CD4T.B" : "#971a00",
+  "CD4T.C" : "#702512",
+  "CD4T.D" : "#4b220a", 
   "CD8T.A" : "#41657c",
   "CD8T.B" : "#223d63",
   "DNT.A" : "#e6c170",
@@ -27,19 +28,20 @@ pop_colors = {
 }
 
 viridis_colors = {
-  "Tumor.A" : "#481F70FF",
-  "Tumor.B" : "#8FD744FF",
-  "CD4T.A" : "#35B779FF",
-  "CD4T.B" : "#C7E02EFF",
-  "CD4T.C" : "#5EC863FF",
-  "CD8T.A" : "#31688EFF",
-  "CD8T.B" : "#287C8EFF",
-  "DNT.A" : "#433A83FF",
-  "DNT.B" : "#21908CFF",
+  "Tumor.A" : "#481D6FFF",
+  "Tumor.B" : "#67CC5CFF",
+  "CD4T.A" : "#25AC82FF",
+  "CD4T.B" : "#CBE11EFF",
+  "CD4T.C" : "#97D83FFF",
+  "CD4T.D" : "#40BC72FF",
+  "CD8T.A" : "#34618DFF",
+  "CD8T.B" : "#2B748EFF",
+  "DNT.A" : "#453581FF",
+  "DNT.B" : "#24878EFF",
   "Microglia.A" : "#FDE725FF",
-  "Microglia.B" : "#3B528BFF",
-  "Macrophage.A" : "#440054FF",
-  "Macrophage.B" : "#20A486FF"
+  "Microglia.B" : "#3D4D8AFF",
+  "Macrophage.A" : "#440154FF",
+  "Macrophage.B" : "#1F998AFF"
 }
 
 def find_voronoi(input_cell):
@@ -154,7 +156,7 @@ def deca_colors(neighbor_data, colormode):
 # Create a box and whisker plot for a given neighborhood 
 needed_cols = pop_colors.keys()
 
-def neighborhood_whisker(n_data):
+def neighborhood_whisker(n_data, colormode):
   needed = n_data[needed_cols].copy()
   d = pd.melt(needed)
   
@@ -164,8 +166,15 @@ def neighborhood_whisker(n_data):
   df_homog = df_homog.reset_index()
   order = df_homog.loc[(df_homog.iloc[:, 1:]!=0).any(axis = 1)]['variable'].tolist()[::-1]
   
+  pal = pop_colors
+  if (colormode == "viridis"):
+    pal = viridis_colors
+  
   fig = plt.figure(figsize = (len(order)*2, 4))
-  g = sns.boxplot(data = d, x = 'variable', y = 'value', showfliers = False, order = order)
+  g = sns.boxplot(
+    data = d, x = 'variable', y = 'value',
+    showfliers = False, order = order, palette = pal
+  )
   g.set(ylim = (0, 1.2))
   g.tick_params(axis = 'x', labelsize = 16)
   g.set_xlabel('')

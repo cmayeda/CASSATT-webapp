@@ -281,17 +281,12 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
   output$deca_key <- renderPlot({ grid.draw(rv$deca_key) })
   
   # Box and Whisker Plot 
-  
-  observeEvent( rv$selected_neighbors, {
-    str(neighborhood_whisker(rv$selected_neighbors))
-  }, ignoreInit = T, ignoreNULL = T)
-  
   output$whisker <- renderImage({
     if (nrow(rv$selected_neighbors) > 0) {
-      neighborhood_whisker(rv$selected_neighbors)
+      neighborhood_whisker(rv$selected_neighbors, server_rv$colormode)
       list(src = "box_whisker.png", height = 250, width = 500)
     }
-  }, deleteFile = T)
+  }, deleteFile = F)
   
 }
 
