@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from scipy.spatial import Voronoi
 from grispy import GriSPy
+from matplotlib import pyplot as plt
+import seaborn as sns
 
 neighborhood_data = pd.read_csv("www/neighborhood_data.csv")
 coords_arr = np.asarray(neighborhood_data[["Global_x", "Global_y"]])
@@ -149,6 +151,28 @@ def deca_colors(neighbor_data, colormode):
   
   return(d_turtle)
   
+# Create a box and whisker plot for a given neighborhood 
+needed_cols = pop_colors.keys()
+
+def neighborhood_whisker(n_data):
+  needed = n_data[needed_cols].copy()
+  d = pd.melt(needed)
+  
+  # get order of gated populations
+  df_homog = pd.melt(needed).groupby("variable").quantile(0.90)
+  df_homog = df_homog.rename(columns = {"value":"cluster"})
+  df_homog = df_homog.reset_index()
+  order = df_homog.loc[(df_homog.iloc[:, 1:]!=0).any(axis = 1)]['variable'].tolist()[::-1]
+  
+  fig = plt.figure(figsize = (len(order)*2, 4))
+  g = sns.boxplot(data = d, x = 'variable', y = 'value', showfliers = False, order = order)
+  g.set(ylim = (0, 1.2))
+  g.tick_params(axis = 'x', labelsize = 16)
+  g.set_xlabel('')
+  g.set_ylabel('Neighbor Frequency', fontsize = 16)
+  plt.tight_layout()
+  plt.savefig('box_whisker.png', dpi = 300)
+  plt.close()
   
   
   

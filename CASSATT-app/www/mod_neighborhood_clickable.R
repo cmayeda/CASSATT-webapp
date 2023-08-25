@@ -52,6 +52,12 @@ neighborhood_clickable_ui <- function(id) {
           column(4, id = "deca_key_col", 
             plotOutput(ns("deca_key"), height = "200px")
           )
+        ),
+        fluidRow(
+          column(12, tags$h5("Box and Whisker Plot")),
+          column(8,
+            imageOutput(ns("whisker"), height = "100%", width = "100%")
+          )
         )
       )
     )
@@ -273,6 +279,19 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
   }, ignoreInit = FALSE)
 
   output$deca_key <- renderPlot({ grid.draw(rv$deca_key) })
+  
+  # Box and Whisker Plot 
+  
+  observeEvent( rv$selected_neighbors, {
+    str(neighborhood_whisker(rv$selected_neighbors))
+  }, ignoreInit = T, ignoreNULL = T)
+  
+  output$whisker <- renderImage({
+    if (nrow(rv$selected_neighbors) > 0) {
+      neighborhood_whisker(rv$selected_neighbors)
+      list(src = "box_whisker.png", height = 250, width = 500)
+    }
+  }, deleteFile = T)
   
 }
 
