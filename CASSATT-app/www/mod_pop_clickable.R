@@ -33,67 +33,88 @@ pop_clickable_ui <- function(id) {
     )
 }
 
+text_click = "#000000"
+text_hover = "#515151"
+
 pop_clickable_server <- function(id, server_rv) {
   moduleServer(id, function(input, output, session) {
     
     rv <- reactiveValues(ordered_data = neighborhood_data,
                          col = "pop_ID",
                          pal = summertime_pal,
-                         breaks = names(summertime_pal)[1:13],
-                         visible = names(summertime_pal)[1:13],
-                         percent_asset = "www/assets/pop_fractions_summertime.jpg")
-    
-    outline_click = "#fbb700"
-    outline_hover = "#ddcca1"
-    text_click = "#000000"
-    text_hover = "#515151"
-    
-    gir_options = list(
-      opts_toolbar(saveaspng = FALSE),
-      opts_hover(css = paste0("stroke:",outline_hover,"; stroke-width:1px;")),
-      opts_hover_key(css = girafe_css(
-        css = paste0("stroke:",outline_hover,"; stroke-width:1px;"),
-        text = paste0("stroke:",text_hover,"; stroke-width:0.5px;")
-      )),
-      opts_selection(css = paste0("stroke:",outline_click,"; stroke-width:1px;"), type = "single"),
-      opts_selection_key(css = girafe_css(
-        css = paste0("stroke:",outline_click,"; stroke-width:1px"),
-        text = paste0("stroke-width:0.5px; stroke:",text_click,";")
-      ), type = "single")
-    )
+                         breaks = names(summertime_pal)[1:14],
+                         visible = names(summertime_pal)[1:14],
+                         percent_asset = "www/assets/pop_fractions_summertime.jpg",
+                         gir_options = list())
     
     # initial plot data order 
     observeEvent( input$plot_selected, {
       rv$ordered_data <<- neighborhood_data
     }, ignoreInit = FALSE, ignoreNULL = FALSE, once = TRUE)
-    
-    # toggle method types & color mode, reset visibility 
+
+    # change color modes, reset plot on method change  
     observeEvent( c(input$method, server_rv$colormode), {
       rv$ordered_data <<- neighborhood_data
-      if(input$method == "kmeans clustering") { 
-        rv$col <<- "kmeans_cluster"
-        rv$visible <<- c(0:15)
-        if (server_rv$colormode == "custom") { 
-          rv$pal <<- summertime_expanded
-          rv$percent_asset <<- "www/assets/clust_fractions_summertime.jpg"
-        } else {
-          rv$pal <<- viridis_kmeans
-          rv$percent_asset <<- "www/assets/clust_fractions_viridis.jpg"
-        }
-        rv$breaks <<- as.character(0:15)
-      } else {
-        rv$col <<- "pop_ID"
-        rv$visible <<- names(summertime_pal)[1:13]
-        if (server_rv$colormode == "custom") { 
+      selected <<- character(0)
+      
+      if (server_rv$colormode == "custom") {
+        rv$percent_asset <<- "www/assets/clust_fractions_summertime.jpg"
+        rv$gir_options <<- list(
+          opts_toolbar(saveaspng = FALSE),
+          opts_hover(css = paste0("stroke:",summertime_hover_col,"; stroke-width:1px;")),
+          opts_hover_key(css = girafe_css(
+            css = paste0("stroke:",summertime_hover_col,"; stroke-width:1px;"),
+            text = paste0("stroke:",text_hover,"; stroke-width:0.5px;")
+          )),
+          opts_selection(css = paste0("stroke:",summertime_selected_col,"; stroke-width:1px;"), type = "single"),
+          opts_selection_key(css = girafe_css(
+            css = paste0("stroke:",summertime_selected_col,"; stroke-width:1px"),
+            text = paste0("stroke-width:0.5px; stroke:",text_click,";")
+          ), type = "single")
+        ) 
+        if (input$method == "expert gating") {
           rv$pal <<- summertime_pal
           rv$percent_asset <<- "www/assets/pop_fractions_summertime.jpg"
+          rv$col <<- "pop_ID"
+          rv$visible <<- names(summertime_pal)[1:14]
+          rv$breaks <<- names(summertime_pal)[1:14]
         } else {
+          rv$pal <<- summertime_expanded
+          rv$percent_asset <<- "www/assets/clust_fractions_summertime.jpg"
+          rv$col <<- "kmeans_cluster"
+          rv$visible <<- c(0:14)
+          rv$breaks <<- as.character(0:14)
+        }
+      } else {
+        rv$percent_asset <<- "www/assets/clust_fractions_summertime.jpg"
+        rv$gir_options <<- list(
+          opts_toolbar(saveaspng = FALSE),
+          opts_hover(css = paste0("stroke:",viridis_hover_col,"; stroke-width:1px;")),
+          opts_hover_key(css = girafe_css(
+            css = paste0("stroke:",viridis_hover_col,"; stroke-width:1px;"),
+            text = paste0("stroke:",text_hover,"; stroke-width:0.5px;")
+          )),
+          opts_selection(css = paste0("stroke:",viridis_selected_col,"; stroke-width:1px;"), type = "single"),
+          opts_selection_key(css = girafe_css(
+            css = paste0("stroke:",viridis_selected_col,"; stroke-width:1px"),
+            text = paste0("stroke-width:0.5px; stroke:",text_click,";")
+          ), type = "single")
+        ) 
+        if (input$method == "expert gating") {
           rv$pal <<- viridis_expert
           rv$percent_asset <<- "www/assets/pop_fractions_viridis.jpg"
+          rv$col <<- "pop_ID"
+          rv$visible <<- names(summertime_pal)[1:14]
+          rv$breaks <<- names(summertime_pal)[1:14]
+        } else {
+          rv$pal <<- viridis_kmeans
+          rv$percent_asset <<- "www/assets/clust_fractions_kmeans.jpg"
+          rv$col <<- "kmeans_cluster"
+          rv$visible <<- c(0:14)
+          rv$breaks <<- as.character(0:14)
         }
-        rv$breaks <<- names(summertime_pal)[1:13]
       }
-    }, ignoreInit = TRUE)
+    }, ignoreInit = F)
     
     # show/hide populations by checkbox selection 
     observeEvent( rv$breaks, {
@@ -106,7 +127,6 @@ pop_clickable_server <- function(id, server_rv) {
       
       # remove a population, keep a blank row for legend 
       rm = setdiff(rv$visible, input$visible_pops)
-      # str(rm)
       
       if (length(rm) > 0) { 
         indxs = which(rv$ordered_data[, rv$col] == rm)
@@ -125,8 +145,6 @@ pop_clickable_server <- function(id, server_rv) {
         rv$pal[rm] <<- "#ffffff"
         
         # unselect in key
-        # str(selected)
-        
         if (length(selected) > 0) {
           if (rm == selected) {
             selected <<- character(0)
@@ -184,7 +202,7 @@ pop_clickable_server <- function(id, server_rv) {
         coord_fixed() +
         scale_y_reverse() +
         theme_clickable()
-      girafe(ggobj = gg, options = gir_options)
+      girafe(ggobj = gg, options = rv$gir_options)
     })
     
     # reorder plot data with clicked population on top 

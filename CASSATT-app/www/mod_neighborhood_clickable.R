@@ -71,16 +71,6 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
                        d_colors = as.list(rep("#ffffff", 10)),
                        deca_key = NULL)
   
-  fill_click = "#fbb700"
-  fill_hover = "#ddcca1"
-  text_click = "#000000"
-  
-  gir_options = list(
-    opts_toolbar(saveaspng = FALSE),
-    opts_hover(css = paste0("fill:",fill_hover,";")),
-    opts_selection(css = paste0("fill:",fill_click,";"), type = "single")
-  )
-  
   output$plot <- renderGirafe({
     gg = ggplot() +
       geom_point_interactive(
@@ -99,7 +89,11 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
       coord_fixed() + 
       scale_y_reverse() +
       theme_clickable()
-    girafe(ggobj = gg, options = gir_options) 
+    girafe(ggobj = gg, options = list(
+      opts_toolbar(saveaspng = FALSE),
+      opts_hover(css = paste0("fill:",server_rv$hover_color,";")),
+      opts_selection(css = paste0("fill:",server_rv$selected_color,";"), type = "single")
+    )) 
   })
   
   # hide and show controls based on neighbor ID method
@@ -126,12 +120,15 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
     rv$selected_neighbors <<- empty_row
   }, ignoreInit = T)
   
+  hideElement("num")
+  hideElement("run")
+  
   # set up warnings 
   RUN_NEEDED = FALSE
   WPRESENT = FALSE
   observeEvent( input$num, {
     RUN_NEEDED <<- TRUE
-  }, ignoreInit = TRUE)
+  }, ignoreInit = T)
   
   # run method on btn press 
   observeEvent( input$run, {
@@ -213,7 +210,7 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
   session$onFlushed(function() {
     session$sendCustomMessage(type = "neighborhood_clickable-plot_set", message = selected)
   }, once = FALSE)
-  
+
   # on colormode change, get new colors 
   observeEvent( server_rv$colormode, {
     if (nrow(rv$selected_neighbors) > 0) {
@@ -221,7 +218,7 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
     } else {
       rv$d_colors <<- as.list(rep("#ffffff", 10))
     }
-  }, ignoreInit = T)
+  })
   
   # plot decagons of cluster cell types 
   observeEvent(rv$selected_neighbors, {

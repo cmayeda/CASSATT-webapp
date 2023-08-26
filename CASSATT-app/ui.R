@@ -8,7 +8,7 @@ shinyUI(fluidPage(
   tags$head(
     tags$link(rel="stylesheet", type="text/css", href="css/style.css"),
     tags$link(rel="stylesheet", type="text/css", href="css/static-intro.css"),
-    # tags$link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Roboto|Urbanist")
+    tags$link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Roboto")
   ),
   
   # -- NAVBAR -- 

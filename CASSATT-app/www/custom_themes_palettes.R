@@ -21,7 +21,6 @@ theme_deca <- function() {
       axis.title = element_blank(),
       axis.ticks = element_blank(), 
       axis.ticks.length = unit(0, "null"), 
-      # axis.ticks.margin = unit(0, "null"), depreciated? 
       panel.border = element_blank(),
       panel.grid = element_blank(),
       plot.margin = unit(c(0,0,0,0), "null"),

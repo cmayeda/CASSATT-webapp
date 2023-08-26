@@ -1,8 +1,15 @@
+summertime_selected_col = "#fbb700"
+summertime_hover_col = "#ddcca1"
+viridis_selected_col = "#ff0202"
+viridis_hover_col = "#ffaaaa"
+
 shinyServer(function(input, output, session) {
 
   rv <- reactiveValues(
     expr_img_list = paste0("www/assets/feature_expr/", list.files("www/assets/feature_expr/", pattern = ".jpg")),
-    colormode = "custom"
+    colormode = "custom",
+    hover_color = summertime_hover_col,
+    selected_color = summertime_selected_col 
   )
   
   # -- Help Text -- 
