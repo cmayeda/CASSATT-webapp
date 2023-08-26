@@ -46,9 +46,9 @@ viridis_colors = {
 
 def find_voronoi(input_cell):
   input_x = np.asarray(input_cell["Global_x"])
-  input_cell_indx = np.intersect1d(vor.points[:, 0], input_x, return_indices = True)[1]
-  input_region = vor.regions[int(vor.point_region[input_cell_indx])] # list of vertices indexes
- 
+  input_cell_indx = np.intersect1d(vor.points[:, 0], input_x, return_indices = True)[1][0]
+  input_region = vor.regions[vor.point_region[input_cell_indx]] # list of vertices indexes
+  
   # find regions that share a vertices with input_region
   neighbor_region_indx = []
   for vert in input_region:
@@ -85,7 +85,7 @@ def find_shell(s_neighbors, input_cell):
 
   # match input cell x and y to coords
   input_x = np.asarray(input_cell["Global_x"])
-  input_cell_indx = np.intersect1d(coords_arr[:, 0], input_x, return_indices = True)[1]
+  input_cell_indx = np.intersect1d(coords_arr[:, 0], input_x, return_indices = True)[1][0]
 
   # take indx from coords, use it to find shell dict item
   s_list = list(s_neighbors.values())
@@ -111,7 +111,7 @@ def find_knn(knn_neighbors, input_cell):
 
   # match input cell x and y to coords
   input_x = np.asarray(input_cell["Global_x"])
-  input_cell_indx = np.intersect1d(coords_arr[:, 0], input_x, return_indices = True)[1]
+  input_cell_indx = np.intersect1d(coords_arr[:, 0], input_x, return_indices = True)[1][0]
 
   # take indx from coords, use it to find shell dict item
   knn_list = list(knn_neighbors.values())

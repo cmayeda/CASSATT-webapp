@@ -1,17 +1,9 @@
-# -- FOR LOCAL
-# use_virtualenv("~/.virtualenvs/r-reticulate")
-
-# -- FOR DEPLOY
-# virtualenv_create("CASSATT-reticulate")
-# py_install("numpy")
-# py_install("pandas")
-# py_install("scipy")
-# py_install("grispy")
-# use_virtualenv("CASSATT-reticulate")
-
 library(cowplot)
 library(grid)
 library(gridExtra)
+
+# install python packages 
+py_install(c("numpy","pandas","scipy","grispy","matplotlib","seaborn"))
 source_python("www/neighbor_functions.py")
 
 decagons = read.csv("www/decagons.csv")
@@ -229,7 +221,7 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
     } else {
       rv$d_colors <<- as.list(rep("#ffffff", 10))
     }
-  }, ignoreInit = T) 
+  }, ignoreInit = T)
   
   # plot decagons of cluster cell types 
   observeEvent(rv$selected_neighbors, {
@@ -279,7 +271,7 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
   }, ignoreInit = FALSE)
 
   output$deca_key <- renderPlot({ grid.draw(rv$deca_key) })
-  
+
   # Box and Whisker Plot 
   output$whisker <- renderImage({
     neighborhood_whisker(rv$selected_neighbors, server_rv$colormode)
