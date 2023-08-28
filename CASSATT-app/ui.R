@@ -157,7 +157,7 @@ shinyUI(fluidPage(
                   tags$img(src = "assets/tiled_PD-1.jpg")
               ),
               column(4,
-                  tags$img(src = "assets/tissue_detection.jpg")
+                  tags$img(src = "assets/tissue_detection.png")
               ),
               column(4,
                   tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 
