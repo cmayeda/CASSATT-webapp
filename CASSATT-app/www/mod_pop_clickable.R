@@ -44,8 +44,7 @@ pop_clickable_server <- function(id, server_rv) {
                          pal = summertime_pal,
                          breaks = names(summertime_pal)[1:14],
                          visible = names(summertime_pal)[1:14],
-                         percent_asset = "www/assets/pop_fractions_summertime.jpg",
-                         gir_options = list())
+                         percent_asset = "www/assets/pop_fractions_summertime.jpg")
     
     # initial plot data order 
     observeEvent( input$plot_selected, {
@@ -59,19 +58,6 @@ pop_clickable_server <- function(id, server_rv) {
       
       if (server_rv$colormode == "custom") {
         rv$percent_asset <<- "www/assets/clust_fractions_summertime.jpg"
-        rv$gir_options <<- list(
-          opts_toolbar(saveaspng = FALSE),
-          opts_hover(css = paste0("stroke:",summertime_hover_col,"; stroke-width:1px;")),
-          opts_hover_key(css = girafe_css(
-            css = paste0("stroke:",summertime_hover_col,"; stroke-width:1px;"),
-            text = paste0("stroke:",text_hover,"; stroke-width:0.5px;")
-          )),
-          opts_selection(css = paste0("stroke:",summertime_selected_col,"; stroke-width:1px;"), type = "single"),
-          opts_selection_key(css = girafe_css(
-            css = paste0("stroke:",summertime_selected_col,"; stroke-width:1px"),
-            text = paste0("stroke-width:0.5px; stroke:",text_click,";")
-          ), type = "single")
-        ) 
         if (input$method == "expert gating") {
           rv$pal <<- summertime_pal
           rv$percent_asset <<- "www/assets/pop_fractions_summertime.jpg"
@@ -87,19 +73,6 @@ pop_clickable_server <- function(id, server_rv) {
         }
       } else {
         rv$percent_asset <<- "www/assets/clust_fractions_summertime.jpg"
-        rv$gir_options <<- list(
-          opts_toolbar(saveaspng = FALSE),
-          opts_hover(css = paste0("stroke:",viridis_hover_col,"; stroke-width:1px;")),
-          opts_hover_key(css = girafe_css(
-            css = paste0("stroke:",viridis_hover_col,"; stroke-width:1px;"),
-            text = paste0("stroke:",text_hover,"; stroke-width:0.5px;")
-          )),
-          opts_selection(css = paste0("stroke:",viridis_selected_col,"; stroke-width:1px;"), type = "single"),
-          opts_selection_key(css = girafe_css(
-            css = paste0("stroke:",viridis_selected_col,"; stroke-width:1px"),
-            text = paste0("stroke-width:0.5px; stroke:",text_click,";")
-          ), type = "single")
-        ) 
         if (input$method == "expert gating") {
           rv$pal <<- viridis_expert
           rv$percent_asset <<- "www/assets/pop_fractions_viridis.jpg"
@@ -202,7 +175,19 @@ pop_clickable_server <- function(id, server_rv) {
         coord_fixed() +
         scale_y_reverse() +
         theme_clickable()
-      girafe(ggobj = gg, options = rv$gir_options)
+      girafe(ggobj = gg, options = list(
+        opts_toolbar(saveaspng = FALSE),
+        opts_hover(css = paste0("stroke:",server_rv$hover_color,"; stroke-width:1px;")),
+        opts_hover_key(css = girafe_css(
+          css = paste0("stroke:",server_rv$hover_color,"; stroke-width:1px;"),
+          text = paste0("stroke:",text_hover,"; stroke-width:0.5px;")
+        )),
+        opts_selection(css = paste0("stroke:",server_rv$selected_color,"; stroke-width:1px;"), type = "single"),
+        opts_selection_key(css = girafe_css(
+          css = paste0("stroke:",server_rv$selected_color,"; stroke-width:1px"),
+          text = paste0("stroke-width:0.5px; stroke:",text_click,";")
+        ), type = "single"))
+      )
     })
     
     # reorder plot data with clicked population on top 

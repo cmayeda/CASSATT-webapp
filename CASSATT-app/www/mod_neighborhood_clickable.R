@@ -79,11 +79,11 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
         aes(x = Global_x, y = Global_y, data_id = rownames(neighborhood_data))
       ) +
       geom_point_interactive(
-        data = rv$selected_neighbors, cex = dot_size, col = "#41657c", 
+        data = rv$selected_neighbors, cex = dot_size, col = server_rv$neighbor_color, 
         aes(x = Global_x, y = Global_y, data_id = orig_indx)
       ) +
       geom_point_interactive(
-        data = rv$selected_point, cex = dot_size, col = "#fbb700", 
+        data = rv$selected_point, cex = dot_size, col = server_rv$selected_color, 
         aes(x = Global_x, y = Global_y, data_id = orig_indx)
       ) +
       coord_fixed() + 

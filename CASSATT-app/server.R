@@ -1,15 +1,11 @@
-summertime_selected_col = "#fbb700"
-summertime_hover_col = "#ddcca1"
-viridis_selected_col = "#ff0202"
-viridis_hover_col = "#ffaaaa"
-
 shinyServer(function(input, output, session) {
 
   rv <- reactiveValues(
     expr_img_list = paste0("www/assets/feature_expr/", list.files("www/assets/feature_expr/", pattern = ".jpg")),
     colormode = "custom",
-    hover_color = summertime_hover_col,
-    selected_color = summertime_selected_col 
+    hover_color = "",
+    selected_color = "",
+    neighbor_color = ""
   )
   
   # -- Help Text -- 
@@ -27,11 +23,19 @@ shinyServer(function(input, output, session) {
     if (input$colormode %% 2 == 1) {
       rv$expr_img_list <<- paste0("www/assets/feature_expr/colorblind/", list.files("www/assets/feature_expr/colorblind/", pattern = ".jpg"))
       rv$colormode <<- "viridis"
+      rv$hover_color <<- "#ffaaaa"
+      rv$selected_color <<- "#ff0202"
+      rv$neighbor_color <<- "#ce9810" 
+      updateActionButton(session, "colormode", label = "default color mode") 
     } else {
       rv$expr_img_list <<- paste0("www/assets/feature_expr/", list.files("www/assets/feature_expr/", pattern = ".jpg"))
       rv$colormode <<- "custom"
+      rv$hover_color <<- "#ddcca1"
+      rv$selected_color <<- "#fbb700"
+      rv$neighbor_color <<- "#41657c"
+      updateActionButton(session, "colormode", label = "colorblind mode")
     }
-  })
+  }, ignoreInit = F, ignoreNULL = F)
   
   # -- 5: Cell Feature Expression -- 
   output$expr_CD3 <- renderImage({ list(src = rv$expr_img_list[1]) }, deleteFile = FALSE)
