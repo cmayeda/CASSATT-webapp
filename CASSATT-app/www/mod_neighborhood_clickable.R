@@ -1,17 +1,9 @@
-# -- FOR LOCAL
-# use_virtualenv("~/.virtualenvs/r-reticulate")
-
-# -- FOR DEPLOY
-# virtualenv_create("CASSATT-reticulate")
-# py_install("numpy")
-# py_install("pandas")
-# py_install("scipy")
-# py_install("grispy")
-# use_virtualenv("CASSATT-reticulate")
-
 library(cowplot)
 library(grid)
 library(gridExtra)
+
+# install python packages 
+py_install(c("numpy","pandas","scipy","grispy","matplotlib","seaborn"))
 source_python("www/neighbor_functions.py")
 
 decagons = read.csv("www/decagons.csv")
@@ -24,33 +16,33 @@ neighborhood_clickable_ui <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(
-      column(6,
-        girafeOutput(ns("plot"), width = "97.06%")
+      column(8,
+        girafeOutput(ns("plot"))
       ),
-      column(5, offset = 1, 
+      column(4,
+        tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
+        nec tellus imperdiet, mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. 
+        Etiam ac turpis bibendum, fermentum enim vitae, feugiat nulla."), 
+        tags$div(class = "config_menu",
+          selectInput(ns("method"), label = "Select an identification method",
+                      choices = c("voronoi", "shell", "knn"), selected = "voronoi"),
+          numericInput(ns("num"), label = "Number of nearest neighbors", value = 10, min = 5, max = 30),
+          tags$div(id = "warning", class = "warning"), 
+          actionButton(ns("run"), "Calculate nearest neighbors")
+        ), 
         fluidRow(
-          column(6, 
-            tags$div(class = "config_menu",
-              selectInput(ns("method"), label = "Select an identification method",
-                          choices = c("voronoi", "shell", "knn"), selected = "voronoi"),
-              numericInput(ns("num"), label = "Number of nearest neighbors", value = 10, min = 5, max = 30),
-              tags$div(id = "warning", class = "warning"), 
-              actionButton(ns("run"), "Calculate nearest neighbors")
-            )
+          # column(12, tags$h5("Decagon visualization")),
+          column(6, id = "decagons_col", 
+            plotOutput(ns("decagons"), height = "200px")
           ),
-          column(6,
-            tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
-            nec tellus imperdiet, mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. 
-            Etiam ac turpis bibendum, fermentum enim vitae, feugiat nulla.")
+          column(6, id = "deca_key_col", 
+            plotOutput(ns("deca_key"), height = "200px")
           )
         ),
         fluidRow(
-          column(12, tags$h5("Decagon visualization")),
-          column(4, id = "decagons_col", 
-            plotOutput(ns("decagons"), height = "200px")
-          ),
-          column(4, id = "deca_key_col", 
-            plotOutput(ns("deca_key"), height = "200px")
+          # column(12, tags$h5("Box and Whisker Plot")),
+          column(10,
+            imageOutput(ns("whisker"), height = "100%", width = "100%")
           )
         )
       )
@@ -66,42 +58,46 @@ empty_row = data.frame(
 
 neighborhood_clickable_server <- function(input, output, session, server_rv) {
   
-  rv <- reactiveValues(selected_point = empty_row,
+  rv <- reactiveValues(neighbor_pal = NULL, 
+                       selected_point = empty_row,
                        selected_neighbors = empty_row, 
                        knn_neighbors = data.frame(), 
                        s_neighbors = data.frame(),
                        d_colors = as.list(rep("#ffffff", 10)),
                        deca_key = NULL)
   
-  fill_click = "#fbb700"
-  fill_hover = "#ddcca1"
-  text_click = "#000000"
-  
-  gir_options = list(
-    opts_toolbar(saveaspng = FALSE),
-    opts_hover(css = paste0("fill:",fill_hover,";")),
-    opts_selection(css = paste0("fill:",fill_click,";"), type = "single")
-  )
+  observeEvent( server_rv$colormode, {
+    rv$neighbor_pal <<- c(
+      "selected" = server_rv$selected_color, 
+      "neighbor" = server_rv$neighbor_color, 
+      "unselected" = "lightgray"
+    )
+  }, ignoreInit = F)
   
   output$plot <- renderGirafe({
     gg = ggplot() +
       geom_point_interactive(
         data = neighborhood_data, 
-        cex = dot_size, col = "lightgray", 
-        aes(x = Global_x, y = Global_y, data_id = rownames(neighborhood_data))
+        cex = dot_size,  
+        aes(x = Global_x, y = Global_y, col = "unselected", data_id = rownames(neighborhood_data))
       ) +
       geom_point_interactive(
-        data = rv$selected_neighbors, cex = dot_size, col = "#41657c", 
-        aes(x = Global_x, y = Global_y, data_id = orig_indx)
+        data = rv$selected_neighbors, cex = dot_size,  
+        aes(x = Global_x, y = Global_y, col = "neighbor", data_id = orig_indx)
       ) +
       geom_point_interactive(
-        data = rv$selected_point, cex = dot_size, col = "#fbb700", 
-        aes(x = Global_x, y = Global_y, data_id = orig_indx)
+        data = rv$selected_point, cex = dot_size,  
+        aes(x = Global_x, y = Global_y, col = "selected", data_id = orig_indx)
       ) +
       coord_fixed() + 
+      scale_color_manual(values = rv$neighbor_pal, name = "Status") +
       scale_y_reverse() +
       theme_clickable()
-    girafe(ggobj = gg, options = gir_options) 
+    girafe(ggobj = gg, options = list(
+      opts_toolbar(saveaspng = FALSE),
+      opts_hover(css = paste0("fill:",server_rv$hover_color,";")),
+      opts_selection(css = paste0("fill:",server_rv$selected_color,";"), type = "single")
+    )) 
   })
   
   # hide and show controls based on neighbor ID method
@@ -128,12 +124,15 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
     rv$selected_neighbors <<- empty_row
   }, ignoreInit = T)
   
+  hideElement("num")
+  hideElement("run")
+  
   # set up warnings 
   RUN_NEEDED = FALSE
   WPRESENT = FALSE
   observeEvent( input$num, {
     RUN_NEEDED <<- TRUE
-  }, ignoreInit = TRUE)
+  }, ignoreInit = T)
   
   # run method on btn press 
   observeEvent( input$run, {
@@ -215,7 +214,7 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
   session$onFlushed(function() {
     session$sendCustomMessage(type = "neighborhood_clickable-plot_set", message = selected)
   }, once = FALSE)
-  
+
   # on colormode change, get new colors 
   observeEvent( server_rv$colormode, {
     if (nrow(rv$selected_neighbors) > 0) {
@@ -223,7 +222,7 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
     } else {
       rv$d_colors <<- as.list(rep("#ffffff", 10))
     }
-  }, ignoreInit = T) 
+  })
   
   # plot decagons of cluster cell types 
   observeEvent(rv$selected_neighbors, {
@@ -273,6 +272,12 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
   }, ignoreInit = FALSE)
 
   output$deca_key <- renderPlot({ grid.draw(rv$deca_key) })
+
+  # Box and Whisker Plot 
+  output$whisker <- renderImage({
+    neighborhood_whisker(rv$selected_neighbors, server_rv$colormode)
+    list(src = "box_whisker.png", height = 250, width = 500)
+  }, deleteFile = T)
   
 }
 

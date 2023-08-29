@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from scipy.spatial import Voronoi
 from grispy import GriSPy
+from matplotlib import pyplot as plt
+import seaborn as sns
 
 neighborhood_data = pd.read_csv("www/neighborhood_data.csv")
 coords_arr = np.asarray(neighborhood_data[["Global_x", "Global_y"]])
@@ -11,9 +13,10 @@ vor = Voronoi(coords_arr)
 pop_colors = {
   "Tumor.A" : "#3d3456",
   "Tumor.B" : "#75647a",
-  "CD4T.A" : "#971a00",
-  "CD4T.B" : "#702512",
-  "CD4T.C" : "#4b220a",
+  "CD4T.A" : "#662133",
+  "CD4T.B" : "#971a00",
+  "CD4T.C" : "#702512",
+  "CD4T.D" : "#4b220a", 
   "CD8T.A" : "#41657c",
   "CD8T.B" : "#223d63",
   "DNT.A" : "#e6c170",
@@ -25,26 +28,27 @@ pop_colors = {
 }
 
 viridis_colors = {
-  "Tumor.A" : "#481F70FF",
-  "Tumor.B" : "#8FD744FF",
-  "CD4T.A" : "#35B779FF",
-  "CD4T.B" : "#C7E02EFF",
-  "CD4T.C" : "#5EC863FF",
-  "CD8T.A" : "#31688EFF",
-  "CD8T.B" : "#287C8EFF",
-  "DNT.A" : "#433A83FF",
-  "DNT.B" : "#21908CFF",
+  "Tumor.A" : "#481D6FFF",
+  "Tumor.B" : "#67CC5CFF",
+  "CD4T.A" : "#25AC82FF",
+  "CD4T.B" : "#CBE11EFF",
+  "CD4T.C" : "#97D83FFF",
+  "CD4T.D" : "#40BC72FF",
+  "CD8T.A" : "#34618DFF",
+  "CD8T.B" : "#2B748EFF",
+  "DNT.A" : "#453581FF",
+  "DNT.B" : "#24878EFF",
   "Microglia.A" : "#FDE725FF",
-  "Microglia.B" : "#3B528BFF",
-  "Macrophage.A" : "#440054FF",
-  "Macrophage.B" : "#20A486FF"
+  "Microglia.B" : "#3D4D8AFF",
+  "Macrophage.A" : "#440154FF",
+  "Macrophage.B" : "#1F998AFF"
 }
 
 def find_voronoi(input_cell):
   input_x = np.asarray(input_cell["Global_x"])
-  input_cell_indx = np.intersect1d(vor.points[:, 0], input_x, return_indices = True)[1]
-  input_region = vor.regions[int(vor.point_region[input_cell_indx])] # list of vertices indexes
- 
+  input_cell_indx = np.intersect1d(vor.points[:, 0], input_x, return_indices = True)[1][0]
+  input_region = vor.regions[vor.point_region[input_cell_indx]] # list of vertices indexes
+  
   # find regions that share a vertices with input_region
   neighbor_region_indx = []
   for vert in input_region:
@@ -81,7 +85,7 @@ def find_shell(s_neighbors, input_cell):
 
   # match input cell x and y to coords
   input_x = np.asarray(input_cell["Global_x"])
-  input_cell_indx = np.intersect1d(coords_arr[:, 0], input_x, return_indices = True)[1]
+  input_cell_indx = np.intersect1d(coords_arr[:, 0], input_x, return_indices = True)[1][0]
 
   # take indx from coords, use it to find shell dict item
   s_list = list(s_neighbors.values())
@@ -107,7 +111,7 @@ def find_knn(knn_neighbors, input_cell):
 
   # match input cell x and y to coords
   input_x = np.asarray(input_cell["Global_x"])
-  input_cell_indx = np.intersect1d(coords_arr[:, 0], input_x, return_indices = True)[1]
+  input_cell_indx = np.intersect1d(coords_arr[:, 0], input_x, return_indices = True)[1][0]
 
   # take indx from coords, use it to find shell dict item
   knn_list = list(knn_neighbors.values())
@@ -149,6 +153,45 @@ def deca_colors(neighbor_data, colormode):
   
   return(d_turtle)
   
+# Create a box and whisker plot for a given neighborhood 
+needed_cols = pop_colors.keys()
+
+def neighborhood_whisker(n_data, colormode):
+  
+  if (len(n_data) > 0):
+    needed = n_data[needed_cols].copy()
+    d = pd.melt(needed)
+
+    # get order of gated populations
+    df_homog = pd.melt(needed).groupby("variable").quantile(0.90)
+    df_homog = df_homog.rename(columns = {"value":"cluster"})
+    df_homog = df_homog.reset_index()
+    order = df_homog.loc[(df_homog.iloc[:, 1:]!=0).any(axis = 1)]['variable'].tolist()[::-1]
+
+    pal = pop_colors
+    if (colormode == "viridis"):
+      pal = viridis_colors
+
+    fig = plt.figure(figsize = (len(order)*2, 4))
+    g = sns.boxplot(
+      data = d, x = 'variable', y = 'value',
+      showfliers = False, order = order, palette = pal
+    )
+    g.set(ylim = (0, 1.2))
+    g.tick_params(axis = 'x', labelsize = 16)
+    g.set_xlabel('')
+    g.set_ylabel('Neighbor Frequency', fontsize = 16)
+    plt.tight_layout()
+    plt.savefig('box_whisker.png', dpi = 300)
+    plt.close()
+
+  else:
+    fig = plt.figure()
+    g = sns.boxplot()
+    g.set_ylabel('Neighbor Frequency', fontsize = 16)
+    plt.tight_layout()
+    plt.savefig('box_whisker.png', dpi = 300)
+    plt.close()
   
   
   

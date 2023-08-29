@@ -8,7 +8,7 @@ shinyUI(fluidPage(
   tags$head(
     tags$link(rel="stylesheet", type="text/css", href="css/style.css"),
     tags$link(rel="stylesheet", type="text/css", href="css/static-intro.css"),
-    # tags$link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Roboto|Urbanist")
+    tags$link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Roboto")
   ),
   
   # -- NAVBAR -- 
@@ -157,7 +157,7 @@ shinyUI(fluidPage(
                   tags$img(src = "assets/tiled_PD-1.jpg")
               ),
               column(4,
-                  tags$img(src = "assets/tissue_detection.jpg")
+                  tags$img(src = "assets/tissue_detection.png")
               ),
               column(4,
                   tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 
@@ -237,37 +237,37 @@ shinyUI(fluidPage(
                   fluidRow(
                       column(3,
                           tags$h6("CD3"),
-                          plotOutput("expr_CD3", height = "100%")
+                          imageOutput("expr_CD3", height = "100%")
                       ),
                       column(3,
                           tags$h6("CD4"),
-                          plotOutput("expr_CD4", height = "100%")
+                          imageOutput("expr_CD4", height = "100%")
                       ),
                       column(3,
                           tags$h6("CD8"),
-                          plotOutput("expr_CD8", height = "100%")
+                          imageOutput("expr_CD8", height = "100%")
                       ),
                       column(3,
                           tags$h6("CD68"),
-                          plotOutput("expr_CD68", height = "100%")
+                          imageOutput("expr_CD68", height = "100%")
                       ),
                   ),
                   fluidRow(
                       column(3, 
                           tags$h6("FoxP3"),
-                          plotOutput("expr_FoxP3", height = "100%")
+                          imageOutput("expr_FoxP3", height = "100%")
                       ),
                       column(3, 
                           tags$h6("Iba-1"),
-                          plotOutput("expr_Iba1", height = "100%")
+                          imageOutput("expr_Iba1", height = "100%")
                       ),
                       column(3, 
                           tags$h6("PD-1"),
-                          plotOutput("expr_PD", height = "100%")
+                          imageOutput("expr_PD", height = "100%")
                       ),
                       column(3,
                           tags$h6("PD-L1"),
-                          plotOutput("expr_PDL", height = "100%")
+                          imageOutput("expr_PDL", height = "100%")
                       ),
                     ),
              ),
@@ -287,15 +287,45 @@ shinyUI(fluidPage(
           tags$h3("Step 7: Population Identification")
       )
   ),
-  pop_clickable_ui("pop_clickable"), 
-  
-  # -- STEP 8: Neighborhood ID & Analysis -- 
   fluidRow(
-      column(10, offset = 1, 
-          tags$h3("Step 8: Neighborhood Identification & Analysis")
+      column(10, offset = 1,
+          pop_clickable_ui("pop_clickable")       
       )
   ),
-  neighborhood_clickable_ui("neighborhood_clickable"), 
+  
+  # -- STEP 8: Neighborhood ID & Analysis --
+  fluidRow(
+      column(10, offset = 1, 
+          tags$h3("Step 8: Bulk Neighborhood Analysis")
+      )
+  ),
+  fluidRow(
+      column(10, offset = 1,
+          fluidRow(
+              column(8, 
+                  imageOutput("log_odds", height = "100%")
+              ),
+              column(4,
+                  tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 
+                  mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. Etiam ac turpis bibendum, fermentum 
+                  enim vitae, feugiat nulla. Morbi pharetra euismod dictum. Class aptent taciti sociosqu ad litora torquent per 
+                  conubia nostra, per inceptos himenaeos.")
+              ) 
+          )
+      )
+  ),
+  
+  # -- STEP 9: Neighborhood ID & Analysis -- 
+  fluidRow(
+      column(10, offset = 1, 
+          tags$h3("Step 9: Neighborhood Identification & Analysis")
+      )
+  ),
+  fluidRow(
+      column(10, offset = 1, 
+          neighborhood_clickable_ui("neighborhood_clickable"),       
+      )
+  ), 
 
   # -- Footer -- 
   fluidRow(id = "footer", 
