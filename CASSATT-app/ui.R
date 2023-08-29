@@ -237,37 +237,37 @@ shinyUI(fluidPage(
                   fluidRow(
                       column(3,
                           tags$h6("CD3"),
-                          plotOutput("expr_CD3", height = "100%")
+                          imageOutput("expr_CD3", height = "100%")
                       ),
                       column(3,
                           tags$h6("CD4"),
-                          plotOutput("expr_CD4", height = "100%")
+                          imageOutput("expr_CD4", height = "100%")
                       ),
                       column(3,
                           tags$h6("CD8"),
-                          plotOutput("expr_CD8", height = "100%")
+                          imageOutput("expr_CD8", height = "100%")
                       ),
                       column(3,
                           tags$h6("CD68"),
-                          plotOutput("expr_CD68", height = "100%")
+                          imageOutput("expr_CD68", height = "100%")
                       ),
                   ),
                   fluidRow(
                       column(3, 
                           tags$h6("FoxP3"),
-                          plotOutput("expr_FoxP3", height = "100%")
+                          imageOutput("expr_FoxP3", height = "100%")
                       ),
                       column(3, 
                           tags$h6("Iba-1"),
-                          plotOutput("expr_Iba1", height = "100%")
+                          imageOutput("expr_Iba1", height = "100%")
                       ),
                       column(3, 
                           tags$h6("PD-1"),
-                          plotOutput("expr_PD", height = "100%")
+                          imageOutput("expr_PD", height = "100%")
                       ),
                       column(3,
                           tags$h6("PD-L1"),
-                          plotOutput("expr_PDL", height = "100%")
+                          imageOutput("expr_PDL", height = "100%")
                       ),
                     ),
              ),
@@ -289,10 +289,32 @@ shinyUI(fluidPage(
   ),
   pop_clickable_ui("pop_clickable"), 
   
-  # -- STEP 8: Neighborhood ID & Analysis -- 
+  # -- STEP 8: Neighborhood ID & Analysis --
   fluidRow(
       column(10, offset = 1, 
-          tags$h3("Step 8: Neighborhood Identification & Analysis")
+          tags$h3("Step 8: Bulk Neighborhood Analysis")
+      )
+  ),
+  fluidRow(
+      column(10, offset = 1,
+          fluidRow(
+              column(7, 
+                  imageOutput("log_odds", height = "100%")
+              ),
+              column(5,
+                  tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 
+                  mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. Etiam ac turpis bibendum, fermentum 
+                  enim vitae, feugiat nulla. Morbi pharetra euismod dictum. Class aptent taciti sociosqu ad litora torquent per 
+                  conubia nostra, per inceptos himenaeos.")
+              ) 
+          )
+      )
+  ),
+  
+  # -- STEP 9: Neighborhood ID & Analysis -- 
+  fluidRow(
+      column(10, offset = 1, 
+          tags$h3("Step 9: Neighborhood Identification & Analysis")
       )
   ),
   neighborhood_clickable_ui("neighborhood_clickable"), 
