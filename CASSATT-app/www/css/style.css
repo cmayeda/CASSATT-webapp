@@ -97,6 +97,7 @@ h3 {
 /* -- Step 7: Population Id -- */
 #pop_click_col {
   padding-right: 0px;
+  padding-left: 0px;
 }
 #pop_boxes_col {
   padding-left: 0px;
@@ -118,6 +119,9 @@ h3 {
 }
 #pop_clickable-visible_pops div.checkbox input {
   margin-top: 0px;
+}
+#pop_menu_col {
+  padding-left: 15px;
 }
 
 /* -- Step 8: Neighborhood Analysis -- */ 

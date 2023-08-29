@@ -16,38 +16,32 @@ neighborhood_clickable_ui <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(
-      column(6,
-        girafeOutput(ns("plot"), width = "97.06%")
+      column(8,
+        girafeOutput(ns("plot"))
       ),
-      column(5, offset = 1, 
+      column(4,
+        tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
+        nec tellus imperdiet, mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. 
+        Etiam ac turpis bibendum, fermentum enim vitae, feugiat nulla."), 
+        tags$div(class = "config_menu",
+          selectInput(ns("method"), label = "Select an identification method",
+                      choices = c("voronoi", "shell", "knn"), selected = "voronoi"),
+          numericInput(ns("num"), label = "Number of nearest neighbors", value = 10, min = 5, max = 30),
+          tags$div(id = "warning", class = "warning"), 
+          actionButton(ns("run"), "Calculate nearest neighbors")
+        ), 
         fluidRow(
-          column(6, 
-            tags$div(class = "config_menu",
-              selectInput(ns("method"), label = "Select an identification method",
-                          choices = c("voronoi", "shell", "knn"), selected = "voronoi"),
-              numericInput(ns("num"), label = "Number of nearest neighbors", value = 10, min = 5, max = 30),
-              tags$div(id = "warning", class = "warning"), 
-              actionButton(ns("run"), "Calculate nearest neighbors")
-            )
-          ),
-          column(6,
-            tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
-            nec tellus imperdiet, mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. 
-            Etiam ac turpis bibendum, fermentum enim vitae, feugiat nulla.")
-          )
-        ),
-        fluidRow(
-          column(12, tags$h5("Decagon visualization")),
-          column(4, id = "decagons_col", 
+          # column(12, tags$h5("Decagon visualization")),
+          column(6, id = "decagons_col", 
             plotOutput(ns("decagons"), height = "200px")
           ),
-          column(4, id = "deca_key_col", 
+          column(6, id = "deca_key_col", 
             plotOutput(ns("deca_key"), height = "200px")
           )
         ),
         fluidRow(
-          column(12, tags$h5("Box and Whisker Plot")),
-          column(8,
+          # column(12, tags$h5("Box and Whisker Plot")),
+          column(10,
             imageOutput(ns("whisker"), height = "100%", width = "100%")
           )
         )
@@ -64,29 +58,39 @@ empty_row = data.frame(
 
 neighborhood_clickable_server <- function(input, output, session, server_rv) {
   
-  rv <- reactiveValues(selected_point = empty_row,
+  rv <- reactiveValues(neighbor_pal = NULL, 
+                       selected_point = empty_row,
                        selected_neighbors = empty_row, 
                        knn_neighbors = data.frame(), 
                        s_neighbors = data.frame(),
                        d_colors = as.list(rep("#ffffff", 10)),
                        deca_key = NULL)
   
+  observeEvent( server_rv$colormode, {
+    rv$neighbor_pal <<- c(
+      "selected" = server_rv$selected_color, 
+      "neighbor" = server_rv$neighbor_color, 
+      "unselected" = "lightgray"
+    )
+  }, ignoreInit = F)
+  
   output$plot <- renderGirafe({
     gg = ggplot() +
       geom_point_interactive(
         data = neighborhood_data, 
-        cex = dot_size, col = "lightgray", 
-        aes(x = Global_x, y = Global_y, data_id = rownames(neighborhood_data))
+        cex = dot_size,  
+        aes(x = Global_x, y = Global_y, col = "unselected", data_id = rownames(neighborhood_data))
       ) +
       geom_point_interactive(
-        data = rv$selected_neighbors, cex = dot_size, col = server_rv$neighbor_color, 
-        aes(x = Global_x, y = Global_y, data_id = orig_indx)
+        data = rv$selected_neighbors, cex = dot_size,  
+        aes(x = Global_x, y = Global_y, col = "neighbor", data_id = orig_indx)
       ) +
       geom_point_interactive(
-        data = rv$selected_point, cex = dot_size, col = server_rv$selected_color, 
-        aes(x = Global_x, y = Global_y, data_id = orig_indx)
+        data = rv$selected_point, cex = dot_size,  
+        aes(x = Global_x, y = Global_y, col = "selected", data_id = orig_indx)
       ) +
       coord_fixed() + 
+      scale_color_manual(values = rv$neighbor_pal, name = "Status") +
       scale_y_reverse() +
       theme_clickable()
     girafe(ggobj = gg, options = list(

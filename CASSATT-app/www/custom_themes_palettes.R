@@ -68,13 +68,6 @@ names(viridis_expert) <- names(summertime_pal)
 viridis_kmeans = sample(viridis(15))
 names(viridis_kmeans) <- as.character(0:14)
 
-# Named palette for Step 8 
-neighbor_palette = c(
-  "selected" = "#fbb700",
-  "neighbor" = "#41657c",
-  "unselected" = "lightgray"
-)
-
 
 
 

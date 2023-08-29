@@ -287,7 +287,11 @@ shinyUI(fluidPage(
           tags$h3("Step 7: Population Identification")
       )
   ),
-  pop_clickable_ui("pop_clickable"), 
+  fluidRow(
+      column(10, offset = 1,
+          pop_clickable_ui("pop_clickable")       
+      )
+  ),
   
   # -- STEP 8: Neighborhood ID & Analysis --
   fluidRow(
@@ -298,10 +302,10 @@ shinyUI(fluidPage(
   fluidRow(
       column(10, offset = 1,
           fluidRow(
-              column(7, 
+              column(8, 
                   imageOutput("log_odds", height = "100%")
               ),
-              column(5,
+              column(4,
                   tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 
                   mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. Etiam ac turpis bibendum, fermentum 
                   enim vitae, feugiat nulla. Morbi pharetra euismod dictum. Class aptent taciti sociosqu ad litora torquent per 
@@ -317,7 +321,11 @@ shinyUI(fluidPage(
           tags$h3("Step 9: Neighborhood Identification & Analysis")
       )
   ),
-  neighborhood_clickable_ui("neighborhood_clickable"), 
+  fluidRow(
+      column(10, offset = 1, 
+          neighborhood_clickable_ui("neighborhood_clickable"),       
+      )
+  ), 
 
   # -- Footer -- 
   fluidRow(id = "footer", 

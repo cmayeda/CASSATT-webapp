@@ -2,35 +2,32 @@ pop_clickable_ui <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(
-      column(6, id = "pop_click_col", 
-        girafeOutput(ns("plot"))
-      ),
-      column(1, id = "pop_boxes_col",
-        checkboxGroupInput(ns("visible_pops"), NULL, choices = c())
-      ),
-      column(5,
+      column(8, 
         fluidRow(
-          column(6, 
-            tags$div(class = "config_menu",
-              selectInput(ns("method"),
-                          label = "Method of population identification",
-                          choices = c("expert gating", "kmeans clustering"),
-                          selected = "expert gating"),
-              )
-            ),
-            column(6, 
-              tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
-              nec tellus imperdiet, mollis purus non, ornare lectus.") 
-            )
-          ),
-          fluidRow(
-            column(12, 
-              imageOutput(ns("percent"), width = "60%")
-            )  
-          )
+          column(11, id = "pop_click_col",  girafeOutput(ns("plot"))),
+          column(1, id = "pop_boxes_col", checkboxGroupInput(ns("visible_pops"), NULL, choices = c())),
         )
-      )
+      ),
+      column(4,
+        fluidRow(
+          column(12, 
+            tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
+            nec tellus imperdiet, mollis purus non, ornare lectus."),  
+          ), 
+          column(10,
+            tags$div(class = "config_menu",
+              selectInput(ns("method"), 
+                label = "Method of population identification",
+                choices = c("expert gating", "kmeans clustering"),
+                selected = "expert gating"
+              ),
+            ), 
+            imageOutput(ns("percent"), width = "100%", height = "100%")
+          )   
+        )
+      ) 
     )
+  )
 }
 
 text_click = "#000000"
