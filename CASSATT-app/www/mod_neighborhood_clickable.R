@@ -8,9 +8,7 @@ source_python("www/neighbor_functions.py")
 
 decagons = read.csv("www/decagons.csv")
 neighborhood_data = read.csv("www/neighborhood_data.csv")
-r_to_py(neighborhood_data)
 coords = neighborhood_data[, c("Global_x","Global_y")]
-status = c(rep("unselected", nrow(coords)))
 
 neighborhood_clickable_ui <- function(id) {
   ns <- NS(id)
