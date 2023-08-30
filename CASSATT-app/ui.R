@@ -58,7 +58,7 @@ shinyUI(fluidPage(
   # -- STEP 1: Data Collection -- 
   fluidRow(
       column(10, offset = 1, 
-          tags$h3("Step 1: Cyclic IHD Data Collection")
+          tags$h3("Step 1: Cyclic IHC Data Collection")
       )
   ),
   fluidRow(
