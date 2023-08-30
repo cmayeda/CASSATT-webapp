@@ -146,6 +146,9 @@ h1 {
 #deca_key_col {
   padding-left: 0px;
 }
+#neighborhood_clickable-whisker img {
+  height: 100%;
+}
 
 /* -- Footer -- */ 
 #footer {
