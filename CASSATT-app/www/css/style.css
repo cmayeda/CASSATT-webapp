@@ -21,6 +21,7 @@ a {
   border: 1px solid #aaaaaa;
   border-radius: 4px;
   background-color: #f5f5f5;
+  color: #555555;
 }
 .config_menu .btn {
   text-wrap: wrap;
@@ -110,13 +111,16 @@ h1 {
   padding-right: 0px;
   height: 500px;
 }
-#pop_clickable-visible_pops span {
-  display: none;  
-}
-#pop_clickable-visible_pops div.shiny-options-group {
+#pop_boxes_inner {
   position: absolute;
   top: 50%;
-  transform: translateY(-42%); 
+  transform: translateY(-42%);
+}
+#pop_clickable-visible_pops {
+  margin-bottom: 0px;
+}
+#pop_clickable-visible_pops span {
+  display: none;  
 }
 #pop_clickable-visible_pops div.checkbox {
   margin-top: 0px;
@@ -125,6 +129,11 @@ h1 {
 }
 #pop_clickable-visible_pops div.checkbox input {
   margin-top: 0px;
+}
+#pop_clickable-apply {
+  background-color: #f5f5f5;
+  color: #555555;
+  border-color: #555555;
 }
 #pop_menu_col {
   padding-left: 15px;
