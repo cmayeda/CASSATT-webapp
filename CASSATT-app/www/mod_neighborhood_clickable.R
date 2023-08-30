@@ -7,7 +7,6 @@ py_install(c("numpy","pandas","scipy","grispy","matplotlib","seaborn"))
 source_python("www/neighbor_functions.py")
 
 decagons = read.csv("www/decagons.csv")
-neighborhood_data = read.csv("www/neighborhood_data.csv")
 coords = neighborhood_data[, c("Global_x","Global_y")]
 
 neighborhood_clickable_ui <- function(id) {
