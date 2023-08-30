@@ -15,9 +15,12 @@ status = c(rep("unselected", nrow(coords)))
 neighborhood_clickable_ui <- function(id) {
   ns <- NS(id)
   tagList(
+    # column structure to align exactly with pop clickable 
     fluidRow(
       column(8,
-        girafeOutput(ns("plot"))
+        fluidRow(
+          column(11, girafeOutput(ns("plot")))
+        )
       ),
       column(4,
         tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
