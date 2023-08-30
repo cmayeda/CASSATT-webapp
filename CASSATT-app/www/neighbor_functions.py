@@ -171,24 +171,30 @@ def neighborhood_whisker(n_data, colormode):
     pal = pop_colors
     if (colormode == "viridis"):
       pal = viridis_colors
-
-    fig = plt.figure(figsize = (len(order)*2, 4))
+    
+    w = len(order)*2.5
+    fig = plt.figure(figsize = (w, w*3/4))
     g = sns.boxplot(
       data = d, x = 'variable', y = 'value',
       showfliers = False, order = order, palette = pal
     )
     g.set(ylim = (0, 1.2))
-    g.tick_params(axis = 'x', labelsize = 16)
+    g.tick_params(axis = 'x', labelsize = w*3.2, labelrotation = 90)
+    g.tick_params(axis = "y", labelsize = w*2)
     g.set_xlabel('')
-    g.set_ylabel('Neighbor Frequency', fontsize = 16)
+    g.set_ylabel('Neighbor Frequency', fontsize = w*3.2)
     plt.tight_layout()
     plt.savefig('box_whisker.png', dpi = 300)
     plt.close()
 
   else:
-    fig = plt.figure()
+    w = 5
+    fig = plt.figure(figsize = (w, w*3/4))
     g = sns.boxplot()
-    g.set_ylabel('Neighbor Frequency', fontsize = 16)
+    g.set(ylim = (0, 1.2))
+    g.tick_params(axis = 'x', labelsize = w*3.2, labelrotation = 90)
+    g.tick_params(axis = "y", labelsize = w*2)
+    g.set_ylabel('Neighbor Frequency', fontsize = w*3.2)
     plt.tight_layout()
     plt.savefig('box_whisker.png', dpi = 300)
     plt.close()

@@ -42,7 +42,7 @@ neighborhood_clickable_ui <- function(id) {
         fluidRow(
           # column(12, tags$h5("Box and Whisker Plot")),
           column(10,
-            imageOutput(ns("whisker"), height = "100%", width = "100%")
+            imageOutput(ns("whisker"), height = "250px")
           )
         )
       )
@@ -276,7 +276,7 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
   # Box and Whisker Plot 
   output$whisker <- renderImage({
     neighborhood_whisker(rv$selected_neighbors, server_rv$colormode)
-    list(src = "box_whisker.png", height = 250, width = 500)
+    list(src = "box_whisker.png")
   }, deleteFile = T)
   
 }

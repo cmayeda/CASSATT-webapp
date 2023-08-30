@@ -303,7 +303,7 @@ shinyUI(fluidPage(
       column(10, offset = 1,
           fluidRow(
               column(8, 
-                  imageOutput("log_odds", height = "100%")
+                  imageOutput("log_odds", height = "100%", width = "75%")
               ),
               column(4,
                   tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 

@@ -21,6 +21,7 @@ a {
   border: 1px solid #aaaaaa;
   border-radius: 4px;
   background-color: #f5f5f5;
+  color: #555555;
 }
 .config_menu .btn {
   text-wrap: wrap;
@@ -94,6 +95,12 @@ h3 {
   margin-right: 12px;
 }
 
+h1 { 
+  margin-top: 50px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
 /* -- Step 7: Population Id -- */
 #pop_click_col {
   padding-right: 0px;
@@ -104,13 +111,16 @@ h3 {
   padding-right: 0px;
   height: 500px;
 }
-#pop_clickable-visible_pops span {
-  display: none;  
-}
-#pop_clickable-visible_pops div.shiny-options-group {
+#pop_boxes_inner {
   position: absolute;
   top: 50%;
-  transform: translateY(-42%); 
+  transform: translateY(-42%);
+}
+#pop_clickable-visible_pops {
+  margin-bottom: 0px;
+}
+#pop_clickable-visible_pops span {
+  display: none;  
 }
 #pop_clickable-visible_pops div.checkbox {
   margin-top: 0px;
@@ -119,6 +129,11 @@ h3 {
 }
 #pop_clickable-visible_pops div.checkbox input {
   margin-top: 0px;
+}
+#pop_clickable-apply {
+  background-color: #f5f5f5;
+  color: #555555;
+  border-color: #555555;
 }
 #pop_menu_col {
   padding-left: 15px;
@@ -130,6 +145,9 @@ h3 {
 }
 #deca_key_col {
   padding-left: 0px;
+}
+#neighborhood_clickable-whisker img {
+  height: 100%;
 }
 
 /* -- Footer -- */ 

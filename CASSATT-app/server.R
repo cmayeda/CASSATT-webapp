@@ -31,7 +31,7 @@ shinyServer(function(input, output, session) {
       updateActionButton(session, "colormode", label = "default color mode") 
     } else {
       rv$expr_img_list <<- paste0("www/assets/feature_expr/", list.files("www/assets/feature_expr/", pattern = ".jpg"))
-      rv$log_odds <<- paste0("www/assets/summertime_logodds.png")
+      rv$log_odds <<- paste0("www/assets/pearl_logodds.png")
       rv$colormode <<- "custom"
       rv$hover_color <<- "#ddcca1"
       rv$selected_color <<- "#fbb700"

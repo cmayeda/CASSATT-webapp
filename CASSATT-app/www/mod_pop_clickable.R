@@ -5,7 +5,12 @@ pop_clickable_ui <- function(id) {
       column(8, 
         fluidRow(
           column(11, id = "pop_click_col",  girafeOutput(ns("plot"))),
-          column(1, id = "pop_boxes_col", checkboxGroupInput(ns("visible_pops"), NULL, choices = c())),
+          column(1, id = "pop_boxes_col", 
+            tags$div(id = "pop_boxes_inner", 
+              checkboxGroupInput(ns("visible_pops"), NULL, choices = c()),
+              actionButton(ns("apply"), "Apply")
+            )
+          )
         )
       ),
       column(4,
@@ -93,59 +98,62 @@ pop_clickable_server <- function(id, server_rv) {
         choices = rv$breaks, selected = rv$visible)
     })
     
-    observeEvent( input$visible_pops, {
+    observeEvent( input$apply, {
       
       # remove a population, keep a blank row for legend 
       rm = setdiff(rv$visible, input$visible_pops)
-      
       if (length(rm) > 0) { 
-        indxs = which(rv$ordered_data[, rv$col] == rm)
-        blank_row = as.data.frame(matrix(ncol = 18))
-        colnames(blank_row) <- colnames(rv$ordered_data)
-        blank_row$Global_x <- 500
-        blank_row$Global_y <- 51
-        blank_row[, rv$col] <- unique(rv$ordered_data[indxs, rv$col])
-        rv$ordered_data <<- rbind(rv$ordered_data[-indxs, ], blank_row)
-        
-        # reorder breaks  
-        br_step = rv$breaks[!rv$breaks == rm]
-        rv$breaks <<- c(br_step, rm)
-        
-        # set color to white 
-        rv$pal[rm] <<- "#ffffff"
-        
-        # unselect in key
-        if (length(selected) > 0) {
-          if (rm == selected) {
-            selected <<- character(0)
+        for (pop in rm) {
+          indxs = which(rv$ordered_data[, rv$col] == pop)
+          blank_row = as.data.frame(matrix(ncol = 18))
+          colnames(blank_row) <- colnames(rv$ordered_data)
+          blank_row$Global_x <- 500
+          blank_row$Global_y <- 51
+          blank_row[, rv$col] <- unique(rv$ordered_data[indxs, rv$col])
+          rv$ordered_data <<- rbind(rv$ordered_data[-indxs, ], blank_row)
+          
+          # reorder breaks  
+          br_step = rv$breaks[!rv$breaks == pop]
+          rv$breaks <<- c(br_step, pop)
+          
+          # set color to white 
+          rv$pal[pop] <<- "#ffffff"
+          
+          # unselect in key
+          if (length(selected) > 0) {
+            if (pop == selected) {
+              selected <<- character(0)
+            }
           }
         }
       }
        
       # add back a population, remove blank row 
-      ad = setdiff(input$visible_pops, rv$visible) 
+      ad = setdiff(input$visible_pops, rv$visible)
       if (length(ad) > 0) {
-        blank_indx = which(rv$ordered_data[, rv$col] == ad)
-        step = rv$ordered_data[-blank_indx, ]
-        ad_indxs = which(neighborhood_data[, rv$col] == ad)
-        rv$ordered_data <<- rbind(step, neighborhood_data[ad_indxs, ]) 
-        
-        # reorder breaks 
-        br_step = rv$breaks[!rv$breaks == ad]
-        rv$breaks <<- c(ad, br_step)
-        
-        # replace color 
-        if (server_rv$colormode == "custom") {
-          rv$pal[ad] <<- summertime_pal[ad]
-        } else {
-          rv$pal[ad] <<- viridis_expert[ad]
+        for (pop in ad) {
+          blank_indx = which(rv$ordered_data[, rv$col] == pop)
+          step = rv$ordered_data[-blank_indx, ]
+          ad_indxs = which(neighborhood_data[, rv$col] == pop)
+          rv$ordered_data <<- rbind(step, neighborhood_data[ad_indxs, ]) 
+          
+          # reorder breaks 
+          br_step = rv$breaks[!rv$breaks == pop]
+          rv$breaks <<- c(pop, br_step)
+          
+          # replace color 
+          if (server_rv$colormode == "custom") {
+            rv$pal[ad] <<- summertime_pal[pop]
+          } else {
+            rv$pal[ad] <<- viridis_expert[pop]
+          }
+          
+          # select in key and on plot
+          selected <<- pop
         }
-        
-        # select in key and on plot
-        selected <<- ad
       }
       rv$visible <<- input$visible_pops
-    }, ignoreInit = TRUE, ignoreNULL = TRUE)
+    }, ignoreInit = T, ignoreNULL = T)
     
     # interactive plot and legend 
     output$plot <- renderGirafe({ 
