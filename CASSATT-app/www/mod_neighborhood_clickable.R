@@ -31,7 +31,6 @@ neighborhood_clickable_ui <- function(id) {
           actionButton(ns("run"), "Calculate nearest neighbors")
         ), 
         fluidRow(
-          # column(12, tags$h5("Decagon visualization")),
           column(6, id = "decagons_col", 
             plotOutput(ns("decagons"), height = "200px")
           ),
@@ -40,7 +39,6 @@ neighborhood_clickable_ui <- function(id) {
           )
         ),
         fluidRow(
-          # column(12, tags$h5("Box and Whisker Plot")),
           column(10,
             imageOutput(ns("whisker"), height = "250px")
           )

@@ -1,5 +1,5 @@
 # R Shiny app for CASSATT Pipeline 
-# created by Cass Mayeda 
+# created by Cass Mayeda, protocol by Asa Brockman
 # 11/18/2022 
 
 shinyUI(fluidPage(
@@ -19,7 +19,7 @@ shinyUI(fluidPage(
               tags$a(href = "https://cytolab.github.io", "Cytolab Home")
           ), 
           actionButton("hide_help", "Hide help text"),
-          actionButton("colormode", "colorblind mode")
+          actionButton("colormode", "color deficiency mode")
       )
   ),
   
