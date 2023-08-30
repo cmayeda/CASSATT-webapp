@@ -19,10 +19,10 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  # -- Colorblind Setting -- 
+  # -- Color Deficiency Setting -- 
   observeEvent(input$colormode, {
     if (input$colormode %% 2 == 1) {
-      rv$expr_img_list <<- paste0("www/assets/feature_expr/colorblind/", list.files("www/assets/feature_expr/colorblind/", pattern = ".jpg"))
+      rv$expr_img_list <<- paste0("www/assets/feature_expr/color_deficient/", list.files("www/assets/feature_expr/color_deficient/", pattern = ".jpg"))
       rv$log_odds <<- paste0("www/assets/viridis_logodds.png")
       rv$colormode <<- "viridis"
       rv$hover_color <<- "#ffaaaa"
@@ -36,7 +36,7 @@ shinyServer(function(input, output, session) {
       rv$hover_color <<- "#ddcca1"
       rv$selected_color <<- "#fbb700"
       rv$neighbor_color <<- "#41657c"
-      updateActionButton(session, "colormode", label = "colorblind mode")
+      updateActionButton(session, "colormode", label = "color deficiency mode")
     }
   }, ignoreInit = F, ignoreNULL = F)
   

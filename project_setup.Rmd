@@ -1,0 +1,27 @@
+---
+title: "CASSATT Web App Local Environment Setup"
+date: 08/30/2023
+---
+
+
+```{r}
+# install required R packages 
+install.packages(c(
+  "reticulate", "ggplot2", "shiny", "grid", "gridExtra", 
+  "cowplot", "shinyjs", "ggiraph" 
+))
+```
+
+```{r}
+# create reticulate python virtual environment, install packages
+library(reticulate)
+virtualenv_create("CASSATT-reticulate", version  = "3.10.4")
+py_install(c("numpy","pandas","scipy","grispy","matplotlib","seaborn"), envname = "CASSATT-reticulate")
+```
+
+```{r}
+# Configure R Studio to use the virtual environment we just created 
+# Go to Tools -> Global Options -> Python, and select the environment by path
+# By default it should be in your ~.virtualenvs folder 
+```
+

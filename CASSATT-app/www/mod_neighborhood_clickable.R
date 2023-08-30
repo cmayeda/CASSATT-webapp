@@ -7,17 +7,17 @@ py_install(c("numpy","pandas","scipy","grispy","matplotlib","seaborn"))
 source_python("www/neighbor_functions.py")
 
 decagons = read.csv("www/decagons.csv")
-neighborhood_data = read.csv("www/neighborhood_data.csv")
-r_to_py(neighborhood_data)
 coords = neighborhood_data[, c("Global_x","Global_y")]
-status = c(rep("unselected", nrow(coords)))
 
 neighborhood_clickable_ui <- function(id) {
   ns <- NS(id)
   tagList(
+    # column structure to align exactly with pop clickable 
     fluidRow(
       column(8,
-        girafeOutput(ns("plot"))
+        fluidRow(
+          column(11, girafeOutput(ns("plot")))
+        )
       ),
       column(4,
         tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam 
@@ -31,7 +31,6 @@ neighborhood_clickable_ui <- function(id) {
           actionButton(ns("run"), "Calculate nearest neighbors")
         ), 
         fluidRow(
-          # column(12, tags$h5("Decagon visualization")),
           column(6, id = "decagons_col", 
             plotOutput(ns("decagons"), height = "200px")
           ),
@@ -40,7 +39,6 @@ neighborhood_clickable_ui <- function(id) {
           )
         ),
         fluidRow(
-          # column(12, tags$h5("Box and Whisker Plot")),
           column(10,
             imageOutput(ns("whisker"), height = "250px")
           )

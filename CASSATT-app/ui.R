@@ -1,6 +1,6 @@
 # R Shiny app for CASSATT Pipeline 
-# created by Cass Mayeda 
-# 11/18/2022 
+# created by Cass Mayeda, protocol by Asa Brockman
+# Last updated 08/30/2023
 
 shinyUI(fluidPage(
   useShinyjs(),
@@ -19,7 +19,7 @@ shinyUI(fluidPage(
               tags$a(href = "https://cytolab.github.io", "Cytolab Home")
           ), 
           actionButton("hide_help", "Hide help text"),
-          actionButton("colormode", "colorblind mode")
+          actionButton("colormode", "color deficiency mode")
       )
   ),
   
@@ -58,7 +58,7 @@ shinyUI(fluidPage(
   # -- STEP 1: Data Collection -- 
   fluidRow(
       column(10, offset = 1, 
-          tags$h3("Step 1: Cyclic IHD Data Collection")
+          tags$h3("Step 1: Cyclic IHC Data Collection")
       )
   ),
   fluidRow(
