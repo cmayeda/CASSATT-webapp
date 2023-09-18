@@ -27,29 +27,23 @@ shinyUI(fluidPage(
   fluidRow(
       column(10, offset = 1, 
           tags$h1("CASSATT Imaging Analysis Pipeline"),
-          tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 
-          mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. Etiam ac turpis bibendum, fermentum 
-          enim vitae, feugiat nulla. Morbi pharetra euismod dictum. Class aptent taciti sociosqu ad litora torquent per 
-          conubia nostra, per inceptos himenaeos. In tincidunt arcu nisl, vel aliquet magna placerat ultrices. Sed 
-          sollicitudin nisl lectus, non congue nibh accumsan non. Vivamus imperdiet bibendum lobortis. Praesent gravida 
-          enim a aliquam faucibus. Vivamus gravida gravida ultricies. Cras id sem et purus dapibus fringilla. Nullam 
-          porttitor lacus accumsan enim scelerisque gravida. Interdum et malesuada fames ac ante ipsum primis in faucibus. 
-          Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Pellentesque purus libero, 
-          egestas non turpis ut, ornare dapibus tortor.")
+          tags$p(class = "help_text", "Welcome to an interactive web-based demo of CASSATT!  This pipeline will serve as an 
+                 introduction to the major steps involved in processing high dimensional imaging datasets for single cell based 
+                 analyses as well as quantifying the spatial relationships between identified cell populationsl 
+                 A far more extensive exploration of CASSATT’s functions than presented in this demo is available at 
+                 (https://pubmed.ncbi.nlm.nih.gov/36748312).")
       )
   ),
   fluidRow(
       column(10, offset = 1,
-          tags$h3("Whole slide and tile optimization"),
+          tags$h3("Tile-based analysis of whole slides"),
           fluidRow(
               column(6, 
                   tags$img(src = "assets/whole_slide.jpg")
               ),
               column(6,
-                  tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 
-                  mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. Etiam ac turpis bibendum, fermentum 
-                  enim vitae, feugiat nulla. Morbi pharetra euismod dictum. Class aptent taciti sociosqu ad litora torquent per 
-                  conubia nostra, per inceptos himenaeos.") 
+                  tags$p(class = "help_text", "To efficiently analyze large scanned slide images from multiple rounds of staining, CASSATT is designed to parallel process data on a 
+                         per-tile basis.  The dataset provided for this demonstration is a four-tile subset of a larger dataset.") 
               )
           )
       )
@@ -58,7 +52,7 @@ shinyUI(fluidPage(
   # -- STEP 1: Data Collection -- 
   fluidRow(
       column(10, offset = 1, 
-          tags$h3("Step 1: Cyclic IHC Data Collection")
+          tags$h3("Step 1: Cyclic IHC data collection")
       )
   ),
   fluidRow(
@@ -70,20 +64,20 @@ shinyUI(fluidPage(
               column(4, id = "raw_thumbnails", 
                   fluidRow(
                       column(3,
-                          tags$h6("CD3"),
-                          tags$img(src = "assets/raw_thumbnails/raw_CD3_thumbnail.jpg")
+                          tags$h6("PD-1"),
+                          tags$img(src = "assets/raw_thumbnails/raw_PD-1_thumbnail.jpg")
                       ),
                       column(3,
-                          tags$h6("CD4"),
-                          tags$img(src = "assets/raw_thumbnails/raw_CD4_thumbnail.jpg")
-                      ),
-                      column(3,
-                          tags$h6("CD8"),
-                          tags$img(src = "assets/raw_thumbnails/raw_CD8_thumbnail.jpg")
+                          tags$h6("PD-L1"),
+                          tags$img(src = "assets/raw_thumbnails/raw_PD-L1_thumbnail.jpg")
                       ),
                       column(3,
                           tags$h6("CD68"),
                           tags$img(src = "assets/raw_thumbnails/raw_CD68_thumbnail.jpg")
+                      ),
+                      column(3,
+                          tags$h6("CD3"),
+                          tags$img(src = "assets/raw_thumbnails/raw_CD3_thumbnail.jpg")
                       ),
                   ),
                   fluidRow(
@@ -96,20 +90,21 @@ shinyUI(fluidPage(
                         tags$img(src = "assets/raw_thumbnails/raw_Iba-1_thumbnail.jpg")
                     ),
                     column(3, 
-                        tags$h6("PD-1"),
-                        tags$img(src = "assets/raw_thumbnails/raw_PD-1_thumbnail.jpg")
+                        tags$h6("CD8"),
+                        tags$img(src = "assets/raw_thumbnails/raw_CD8_thumbnail.jpg")
                     ),
                     column(3,
-                        tags$h6("PD-L1"),
-                        tags$img(src = "assets/raw_thumbnails/raw_PD-L1_thumbnail.jpg")
+                        tags$h6("CD4"),
+                        tags$img(src = "assets/raw_thumbnails/raw_CD4_thumbnail.jpg")
                     ),
                   )
               ),
               column(4,
-                  tags$p(class = "help_text", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec tellus imperdiet, 
-                  mollis purus non, ornare lectus. Pellentesque cursus pellentesque magna. Etiam ac turpis bibendum, fermentum 
-                  enim vitae, feugiat nulla. Morbi pharetra euismod dictum. Class aptent taciti sociosqu ad litora torquent per 
-                  conubia nostra, per inceptos himenaeos.")
+                  tags$p(class = "help_text", "CASSATT is designed to process whole slide scan images from cyclic immunohistochemistry (cycIHC) datasets.  
+                  cycIHC utilizes sequential rounds of colorimetric immunostaining and imaging for quantitative mapping of location and number of cells of interest. Amino ethyl carbazol (AEC) is a 
+                         red colored chromogen commonly used for its contrast with blue hematoxylin counter stain and ability to be easily stripped from tissue using ethanol. Here we show eight 
+                         rounds of AEC staining for common immune markers on a glioblastoma tumor tissue section. Seeing as tissue loss can often be observed across the rounds of staining, CASSATT
+                         automatically detects and analyzes only tissue areas that persist through all rounds of staining")
               ) 
           )
       )
