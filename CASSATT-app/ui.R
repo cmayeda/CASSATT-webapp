@@ -19,7 +19,7 @@ shinyUI(fluidPage(
               tags$a(href = "https://cytolab.github.io", "Cytolab Home")
           ), 
           actionButton("hide_help", "Hide help text"),
-          actionButton("colormode", "color deficiency mode")
+          actionButton("colormode", "adaptive color mode")
       )
   ),
   
@@ -329,7 +329,9 @@ shinyUI(fluidPage(
       tags$p("The CASSATT analysis pipeline is named after the American painter Mary Cassatt. The color palettes used on 
              web page are inspired by her works, in particular ", 
              tags$span(style="font-style:italic","Woman with a Pearl Necklace in a Loge"), 
-             " and ", tags$span(style="font-style:italic", "Summertime"), ".")
+             " and ", tags$span(style="font-style:italic", "Summertime"), "."),
+      tags$p("Adaptive color mode uses the ", tags$a(href = "https://sjmgarnier.github.io/viridis/", "viridis"),
+             " color palette with improved graph readability for people with a range of different color perceiving abilities.")
     )
   )
 ))

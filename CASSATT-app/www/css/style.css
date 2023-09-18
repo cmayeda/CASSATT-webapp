@@ -3,7 +3,7 @@ h2:first-of-type {
   display: none;
 } 
 a {
-  color: #e63cbc;
+  color: #555555;
   text-decoration: underline;
 }
 .action-button {
@@ -12,7 +12,6 @@ a {
   font-size: 12px;
   text-transform: uppercase;
   color: #ffffff;
-  background-color: #005CCB;
   letter-spacing: 0.5px;
 }
 .config_menu {

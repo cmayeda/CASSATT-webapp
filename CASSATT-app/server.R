@@ -19,10 +19,10 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  # -- Color Deficiency Setting -- 
+  # -- Adaptive Color Mode -- 
   observeEvent(input$colormode, {
     if (input$colormode %% 2 == 1) {
-      rv$expr_img_list <<- paste0("www/assets/feature_expr/color_deficient/", list.files("www/assets/feature_expr/color_deficient/", pattern = ".jpg"))
+      rv$expr_img_list <<- paste0("www/assets/feature_expr/viridis/", list.files("www/assets/feature_expr/viridis/", pattern = ".jpg"))
       rv$log_odds <<- paste0("www/assets/viridis_logodds.png")
       rv$colormode <<- "viridis"
       rv$hover_color <<- "#ffaaaa"
@@ -30,13 +30,13 @@ shinyServer(function(input, output, session) {
       rv$neighbor_color <<- "#ce9810" 
       updateActionButton(session, "colormode", label = "default color mode") 
     } else {
-      rv$expr_img_list <<- paste0("www/assets/feature_expr/", list.files("www/assets/feature_expr/", pattern = ".jpg"))
+      rv$expr_img_list <<- paste0("www/assets/feature_expr/Cassatt/", list.files("www/assets/feature_expr/Cassatt/", pattern = ".jpg"))
       rv$log_odds <<- paste0("www/assets/pearl_logodds.png")
       rv$colormode <<- "custom"
       rv$hover_color <<- "#ddcca1"
       rv$selected_color <<- "#fbb700"
       rv$neighbor_color <<- "#41657c"
-      updateActionButton(session, "colormode", label = "color deficiency mode")
+      updateActionButton(session, "colormode", label = "adaptive color mode")
     }
   }, ignoreInit = F, ignoreNULL = F)
   
