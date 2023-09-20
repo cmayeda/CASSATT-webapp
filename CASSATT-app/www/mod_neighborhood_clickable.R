@@ -115,6 +115,7 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
       showElement("num")
       showElement("run")
     } else {
+      RUN_NEEDED <<- FALSE
       hideElement("num")
       hideElement("run")
     }
