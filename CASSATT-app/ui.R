@@ -29,7 +29,9 @@ shinyUI(fluidPage(
           tags$h1("CASSATT Imaging Analysis Pipeline"),
           tags$p(class = "help_text", "Welcome to an interactive web-based demo of CASSATT!  This pipeline will serve as an 
                  introduction to the major steps involved in processing high dimensional imaging datasets for single cell based 
-                 analyses as well as quantifying the spatial relationships between identified cell populations. 
+                 analyses as well as quantifying the spatial relationships between identified cell populations. While CASSATT was 
+                 initially built to process cyclic immunohistochemistry datasets, downstream analysis (Steps 5-9)
+                 can be applied to any high dimensional imaging modality. 
                  A far more extensive exploration of CASSATT’s functions than presented in this demo is available at 
                  (https://pubmed.ncbi.nlm.nih.gov/36748312).")
       )
@@ -156,8 +158,8 @@ shinyUI(fluidPage(
               ),
               column(4,
                   tags$p(class = "help_text", "After tissue registration, each image file is split into a grid of tiles of user-defined size. The fraction of each tile
-                         containing analyzable tissue is computed, and only tiles meeting a user defined threshold for tissue composition will be analyzed - further minimizing
-                         unneccessary computation load.")
+                         containing analyzable tissue is computed (shown here in blue), and only tiles meeting a user defined threshold for tissue composition will be analyzed - further minimizing
+                         unnecessary computation load.")
               ) 
           )
       )
@@ -211,7 +213,8 @@ shinyUI(fluidPage(
             ),
             column(4,
                 tags$p(class = "help_text", "By default, CASSATT uses a custom trained Stardist segmentation model trained on hematoxylin staining to achieve nuclear segmentation.
-                       A pixel expansion of user-defined distance is used to capture 'cytoplasmic' signal around detected nuclei.")
+                       A pixel expansion of user-defined distance is used to capture 'cytoplasmic' signal around detected nuclei. Alternate Stardist segmentation models or any segmentation
+                       strategy that produces a segmentation mask can be easily substituted.")
             ) 
          )
       )
@@ -315,7 +318,10 @@ shinyUI(fluidPage(
       column(10, offset = 1, 
           neighborhood_clickable_ui("neighborhood_clickable"),       
       )
-  ), 
+  ),
+  
+  
+
 
   # -- Footer -- 
   fluidRow(id = "footer", 

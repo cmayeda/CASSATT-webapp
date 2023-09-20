@@ -20,10 +20,12 @@ neighborhood_clickable_ui <- function(id) {
         )
       ),
       column(4,
-        tags$p(class = "help_text", "Cell neighbors can be identified by three methods: Voronoi neighbors are the collection of cells that are 
-        the nearest seed point in the voronoi diagram in every direction from the index cell. Shell neighbors are any cell whose coordinates 
-               fall within a distance set by the user. k-nearest neighbors are the user-defined number of neighbors that are nearest in distance to any index cell. Try each
-               identification method and click on cells to see which neighbor cells are analyzed! Neighborhood characteristic plots for selected cell are shown below."), 
+        tags$p(class = "help_text", "Cell neighbors can be identified by three methods:" ),
+        tags$p(class = "help_text", "Voronoi neighbors are the collection of cells that are 
+        the nearest seed point in the voronoi diagram in every direction from the index cell."),
+        tags$p(class = "help_text", "Shell neighbors are any cell whose coordinates fall within a distance set by the user."),
+        tags$p(class = "help_text", "k-nearest neighbors are the user-defined number of neighbors that are nearest in distance to any index cell."),
+        tags$p(class = "help_text", "Try each identification method and click on cells to see which neighbor cells are analyzed! Neighborhood characteristic plots for selected cell are shown below."), 
         tags$div(class = "config_menu",
           selectInput(ns("method"), label = "Select an identification method",
                       choices = c("voronoi", "shell", "knn"), selected = "voronoi"),
