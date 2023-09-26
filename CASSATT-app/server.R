@@ -56,7 +56,10 @@ shinyServer(function(input, output, session) {
   # -- 8: Bulk Neighborhood Analysis -- 
   output$log_odds <- renderImage ({ list(src = rv$log_odds) }, deleteFile = F)
   
-  # -- 7: Neighborhood ID & Analysis -- 
+  # -- 9: Neighborhood ID & Analysis -- 
   callModule(neighborhood_clickable_server, "neighborhood_clickable", rv)
+  
+  # -- 10
+  callModule(all_neighborhood_server, "all_neighborhood", rv)
 
 })

@@ -16,8 +16,8 @@ pop_clickable_ui <- function(id) {
       column(4,
         fluidRow(
           column(12, 
-            tags$p(class = "help_text", "Populations of cells are identified either by traditional expert gating or by unsupervised clustering. Try each population identification method 
-               and visualize populations of interest!"),  
+            tags$p(class = "help_text", "Populations of cells are identified either by traditional expert gating or by unsupervised clustering. 
+                   Try each population identification method and visualize populations of interest!"),  
           ), 
           column(10,
             tags$div(class = "config_menu",

@@ -44,6 +44,25 @@ viridis_colors = {
   "Macrophage.B" : "#1F998AFF"
 }
 
+def run_shell(distance):
+  upper_radii = float(distance)
+  lower_radii = 0.01
+  shell_dist, shell_ind = coords_gsp.shell_neighbors(
+       coords_arr,
+       distance_lower_bound = lower_radii,
+       distance_upper_bound = upper_radii
+  )
+  
+  # create dict with each list of neighbors as set
+  shell_neighbors = {}
+  for index, v in enumerate(shell_ind):
+      shell_neighbors[index] = list(v)
+
+  return(shell_neighbors)
+
+shell_indexes = run_shell(500)  # Finds shell neighbors up to 500 pixels away (used to exclude erroneous voronoi neighbor matches)
+
+
 def find_voronoi(input_cell):
   input_x = np.asarray(input_cell["Global_x"])
   input_cell_indx = np.intersect1d(vor.points[:, 0], input_x, return_indices = True)[1][0]
@@ -62,24 +81,12 @@ def find_voronoi(input_cell):
     if region_indx in neighbor_region_indx:
       neighbor_indexes.append(cell_indx)
 
+  # exclude cells that exceed maximum allowable distance (temporary fix for voronoi neighbor code)
+  neighbor_indexes = [value for value in neighbor_indexes if value in shell_indexes[input_cell_indx]]
+  
   neighbor_data = neighborhood_data.iloc[neighbor_indexes]
   return(neighbor_data)
   
-def run_shell(distance):
-  upper_radii = float(distance)
-  lower_radii = 0.01
-  shell_dist, shell_ind = coords_gsp.shell_neighbors(
-       coords_arr,
-       distance_lower_bound = lower_radii,
-       distance_upper_bound = upper_radii
-  )
-  
-  # create dict with each list of neighbors as set
-  shell_neighbors = {}
-  for index, v in enumerate(shell_ind):
-      shell_neighbors[index] = list(v)
-
-  return(shell_neighbors)
       
 def find_shell(s_neighbors, input_cell):
 
@@ -201,6 +208,54 @@ def neighborhood_whisker(n_data, colormode):
   
   
   
-  
+def neighborhood_whisker_all(colormode):
+  l_nei = sorted(neighborhood_data['kmeans_cluster'].unique())
+  fig, axs = plt.subplots(nrows = 3, ncols = 5, figsize = (100, 100), constrained_layout = True)   # update for sizing
+  for nei_clust, ax in zip(l_nei, axs.ravel()):
+      
+    neighbor_cluster = neighborhood_data[neighborhood_data['kmeans_cluster']==nei_clust].copy()
+    needed = neighbor_cluster[needed_cols]
+    d = pd.melt(needed)
+
+    
+    df_homog = pd.melt(needed).groupby("variable").quantile(0.90)
+    df_homog = df_homog.rename(columns = {"value":"cluster"})
+    df_homog = df_homog.reset_index()
+    order = df_homog.loc[(df_homog.iloc[:, 1:]!=0).any(axis = 1)]['variable'].tolist()[::-1]
+    
+    pal = pop_colors
+    if (colormode == "viridis"):
+      pal = viridis_colors
+      
+    w = len(order)*2.5
+#      fig = plt.figure(figsize = (w, w*3/4))
+    
+    g = sns.boxplot(
+      data = d, x = 'variable', y = 'value', ax = ax,
+      showfliers = False, order = order, palette = pal)
+    g.set_title("Neighbor Cluster " + str(nei_clust))
+    g.set(ylim = (0, 1.2))
+    g.tick_params(axis = 'x',labelrotation = 90)
+    # g.tick_params(axis = "y", labelsize = w*2)
+    g.set_xlabel('')
+    #g.set_ylabel('Neighbor Frequency')
+    g.set_ylabel('')
+  #plt.tight_layout()
+  fig.supylabel("Neighbor Frequency")  
+  plt.show()  
+  plt.savefig('all_box_whisker.png', dpi = 300)
+  plt.close()
+
+  # else:
+  #   w = 5
+  #   fig = plt.figure(figsize = (w, w*3/4))
+  #   g = sns.boxplot()
+  #   g.set(ylim = (0, 1.2))
+  #   g.tick_params(axis = 'x', labelsize = w*3.2, labelrotation = 90)
+  #   g.tick_params(axis = "y", labelsize = w*2)
+  #   g.set_ylabel('Neighbor Frequency', fontsize = w*3.2)
+  #   plt.tight_layout()
+  #   plt.savefig('box_whisker.png', dpi = 300)
+  #   plt.close()
   
   

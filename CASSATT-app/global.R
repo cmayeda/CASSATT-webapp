@@ -9,6 +9,7 @@ suppressPackageStartupMessages({
 source("www/mod_neighborhood_clickable.R")
 source("www/mod_pop_clickable.R")
 source("www/custom_themes_palettes.R")
+source("www/mod_neighborhood_all.R")
 
 neighborhood_data = read.csv("www/neighborhood_data.csv")
 neighborhood_data$kmeans_cluster <- as.factor(neighborhood_data$kmeans_cluster)
