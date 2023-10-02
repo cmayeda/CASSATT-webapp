@@ -159,6 +159,42 @@ def deca_colors(neighbor_data, colormode):
           count = 0
   
   return(d_turtle)
+
+def deca_all(neighbor_data, colormode):
+  grouped = neighbor_data.groupby('kmeans_cluster')
+  per_clust_colors = {}
+  for cluster, group in grouped:
+    rounded = group.iloc[:, 0:14].mean()
+    rounded = pd.DataFrame(rounded[1:])
+    rounded['dec'] = rounded.apply(lambda x: np.floor(x*10))
+    rounded['rem'] = rounded[0].apply(lambda x: (x*10)-int(x*10))
+    tot = 10 - int(rounded['dec'].sum())
+    rounded.nlargest(tot, ['rem'])['dec'].apply(lambda x : x + 1)
+    rounded.update(pd.DataFrame(rounded.nlargest(tot, ['rem'])['dec'].apply(lambda x : x + 1)))
+    rounded['dec'] = rounded['dec'].apply(np.int64)
+    rounded = rounded.sort_values(by = ['dec'], ascending = False)
+    for_dec = rounded[rounded.dec != 0].reset_index()
+  
+    if colormode == "custom":
+      color_dict = pop_colors
+    elif colormode == "viridis":
+      color_dict = viridis_colors
+  
+    d_dec = {}
+    for index, row in for_dec.iterrows():
+        d_dec[row['index']] = row['dec']
+    d_turtle = {}
+    count2 = 0
+    for key, val in d_dec.items():
+        count = val
+        while count > 0:
+            d_turtle[count2] = color_dict[key]
+            count -= 1
+            count2 +=1
+        else:
+            count = 0
+    per_clust_colors[cluster] = d_turtle
+  return(per_clust_colors)
   
 # Create a box and whisker plot for a given neighborhood 
 needed_cols = pop_colors.keys()

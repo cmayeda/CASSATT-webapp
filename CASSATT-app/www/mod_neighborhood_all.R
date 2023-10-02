@@ -2,12 +2,12 @@ library(cowplot)
 library(grid)
 library(gridExtra)
 
-# install python packages 
-py_install(c("numpy","pandas","scipy","grispy","matplotlib","seaborn"))
-source_python("www/neighbor_functions.py")
+# # install python packages 
+# py_install(c("numpy","pandas","scipy","grispy","matplotlib","seaborn"))
+# source_python("www/neighbor_functions.py")
 
-decagons = read.csv("www/decagons.csv")
-coords = neighborhood_data[, c("Global_x","Global_y")]
+# decagons = read.csv("www/decagons.csv")
+# coords = neighborhood_data[, c("Global_x","Global_y")]
 
 
 all_neighborhoods_ui <- function(id) {
@@ -20,6 +20,11 @@ all_neighborhoods_ui <- function(id) {
                column(11, plotOutput(ns("whisker")))
              )
       ),
+      column(8,
+             fluidRow(
+               column( 11, plotOutput(ns("decagons")))
+             )
+      ),
       column(4,
              tags$p(class = "help_text", "In addition to examining the neighborhoods of individual cells, CASSATT clusters the dataset into 
                     'Neighbor Clusters', each of which is a subset of cells that have a similar neighbor cell composition." ),
@@ -29,21 +34,21 @@ all_neighborhoods_ui <- function(id) {
   )
 }
 
-empty_row = data.frame(
-  "Global_x" = numeric(),
-  "Global_y" = numeric(),
-  "orig_indx" = numeric()
-)
+# empty_row = data.frame(
+#   "Global_x" = numeric(),
+#   "Global_y" = numeric(),
+#   "orig_indx" = numeric()
+# )
 
 all_neighborhood_server <- function(input, output, session, server_rv) {
   
-  rv <- reactiveValues(neighbor_pal = NULL, 
-                       selected_point = empty_row,
-                       selected_neighbors = empty_row, 
-                       knn_neighbors = data.frame(), 
-                       s_neighbors = data.frame(),
-                       d_colors = as.list(rep("#ffffff", 10)),
-                       deca_key = NULL)
+  # rv <- reactiveValues(neighbor_pal = NULL, 
+  #                      selected_point = empty_row,
+  #                      selected_neighbors = empty_row, 
+  #                      knn_neighbors = data.frame(), 
+  #                      s_neighbors = data.frame(),
+  #                      d_colors = as.list(rep("#ffffff", 10)),
+  #                      deca_key = NULL)
   
   # observeEvent( server_rv$colormode, {
   #   rv$neighbor_pal <<- c(
@@ -213,21 +218,30 @@ all_neighborhood_server <- function(input, output, session, server_rv) {
   #   }
   # }, ignoreInit = T)
   # 
-  # output$decagons <- renderPlot({
-  #   plot = ggplot(decagons)
-  #   for (i in 1:10) {
-  #     indxes = which(decagons$name == as.character(i))
-  #     plot <- plot + geom_polygon(
-  #       data = decagons[indxes, ], aes(x = x, y = y),
-  #       fill = rv$d_colors[[i]],
-  #       color = "black", linewidth = 1.25
-  #     )
-  #   }
-  #   plot <- plot +
-  #     coord_fixed() +
-  #     theme_deca()
-  #   return(plot)
-  # })
+  output$decagons <- renderPlot({
+    l_plots = list()
+    l_colors = deca_all(neighborhood_data, server_rv$colormode)
+    for (index in seq_along(l_colors)) {
+      plot = ggplot(decagons)
+      for (i in 1:10) {
+        indxes = which(decagons$name == as.character(i))
+        plot <- plot + geom_polygon(
+          data = decagons[indxes, ], aes(x = x, y = y),
+          fill = l_colors[[index]][[i]],
+          color = "black", linewidth = 1.25
+        )
+      }    
+      plot <- plot +
+      coord_fixed() +
+      theme_deca()
+      
+      l_plots[[index]] <-plot
+    }
+    
+
+    allplot = plot_grid(plotlist = l_plots, nrow = 3)
+    return(allplot)
+  })
   # 
   # observeEvent( rv$d_colors, {
   #   colors = unique(unlist(rv$d_colors))
