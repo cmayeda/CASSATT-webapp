@@ -182,8 +182,8 @@ def neighborhood_whisker(n_data, colormode):
     w = len(order)*2.5
     fig = plt.figure(figsize = (w, w*3/4))
     g = sns.boxplot(
-      data = d, x = 'variable', y = 'value',
-      showfliers = False, order = order, palette = pal
+      data = d, x = 'variable', y = 'value', hue = 'variable',
+      showfliers = False, order = order, palette = pal, legend = False
     )
     g.set(ylim = (0, 1.2))
     g.tick_params(axis = 'x', labelsize = w*3.2, labelrotation = 90)
@@ -231,8 +231,8 @@ def neighborhood_whisker_all(colormode):
 #      fig = plt.figure(figsize = (w, w*3/4))
     
     g = sns.boxplot(
-      data = d, x = 'variable', y = 'value', ax = ax,
-      showfliers = False, order = order, palette = pal)
+      data = d, x = 'variable', y = 'value', ax = ax, hue = 'variable',
+      showfliers = False, order = order, palette = pal, legend = False)
     g.set_title("Neighbor Cluster " + str(nei_clust))
     g.set(ylim = (0, 1.2))
     g.tick_params(axis = 'x',labelrotation = 90)
