@@ -337,7 +337,19 @@ shinyUI(fluidPage(
            all_neighborhoods_ui("all_neighborhood"),
     )
   ),
-
+  
+  
+  # # -- STEP 11: Clickable Neighbor ID -- 
+  # fluidRow(
+  #   column(10, offset = 1, 
+  #          tags$h3("Step 11: Explore Neighborhoods")
+  #   )
+  # ),
+  # fluidRow(
+  #   column(10, offset = 1,
+  #          pop_clickable_ui("pop_clickable")       
+  #   )
+  # ),
 
   # -- Footer -- 
   fluidRow(id = "footer", 
