@@ -27,7 +27,7 @@ all_neighborhoods_ui <- function(id) {
       ),
       
       column(4, 
-             actionButton("plotdisplay", "test"))
+             actionButton(ns("plotdisplay"), "test"))
     )
   )
 }
