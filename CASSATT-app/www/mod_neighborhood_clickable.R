@@ -261,7 +261,7 @@ neighborhood_clickable_server <- function(input, output, session, server_rv) {
     }
     df = data.frame(x = c(1:length(colors)))
     plot = ggplot(df, aes(x = x, y = 1, col = as.factor(x))) +
-      geom_point() +
+      geom_point(size = 5) +
       scale_color_manual(values = colors, labels = types, name = "Population") +
       theme_bw() +
       theme(
