@@ -16,7 +16,8 @@ install.packages(c(
 # create reticulate python virtual environment, install packages
 library(reticulate)
 virtualenv_create("CASSATT-reticulate", version  = "3.10.4")
-py_install(c("numpy","pandas","scipy","grispy","matplotlib","seaborn"), envname = "CASSATT-reticulate")
+py_install(c("numpy==1.25.0","pandas","scipy","grispy","matplotlib","seaborn", "numba", "umap-learn"
+             ), envname = "CASSATT-reticulate")
 ```
 
 ```{r}

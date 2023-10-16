@@ -4,6 +4,8 @@ from scipy.spatial import Voronoi
 from grispy import GriSPy
 from matplotlib import pyplot as plt
 import seaborn as sns
+import umap
+
 
 neighborhood_data = pd.read_csv("www/neighborhood_data.csv")
 coords_arr = np.asarray(neighborhood_data[["Global_x", "Global_y"]])
@@ -278,7 +280,7 @@ def neighborhood_whisker_all(colormode):
     g.set_ylabel('')
   #plt.tight_layout()
   fig.supylabel("Neighbor Frequency")  
-  plt.show()  
+  plt.show()
   plt.savefig('all_box_whisker.png', dpi = 300)
   plt.close()
 
@@ -294,4 +296,41 @@ def neighborhood_whisker_all(colormode):
   #   plt.savefig('box_whisker.png', dpi = 300)
   #   plt.close()
   
-  
+test = run_shell(30)
+
+df_iniche = pd.DataFrame()
+for k, v in test.items():
+    if v == []:
+        df_index_cell = pd.DataFrame(neighborhood_data.loc[k][['Global_x', 'Global_y']]).transpose()
+        df_index_cell.reset_index(inplace = True)
+        zero_sums = np.zeros(shape = (1, len(pop_colors)))
+        sums = pd.DataFrame(zero_sums, columns = list(pop_colors.keys()))
+        
+        df_niche = pd.concat([sums, df_index_cell], axis = 1)
+        df_iniche = pd.concat([df_iniche, df_niche], ignore_index = True)
+    else:
+        _df_iniche = pd.DataFrame()
+        for x in range(len(test[k])):
+            _df_iniche = pd.concat([_df_iniche, neighborhood_data.loc[[list(v)[x]]]], ignore_index = True)
+            _df_iniche.drop(columns = ['kmeans_cluster', 'Global_x', 'Global_y','pop_ID'], inplace = True)
+
+
+        sums = pd.DataFrame(_df_iniche.sum(axis = 0)/len(_df_iniche.index)).transpose() 
+        sums.drop(sums.columns.difference(list(pop_colors.keys())), axis = 1, inplace = True)
+        sums.reset_index(inplace = True, drop = True)
+
+        df_index_cell = pd.DataFrame(neighborhood_data.loc[k][['Global_x', 'Global_y']]).transpose()
+        df_index_cell.reset_index(inplace = True)
+
+        df_niche = pd.concat([sums, df_index_cell], axis = 1)
+        df_iniche = pd.concat([df_iniche, df_niche], ignore_index = True)
+
+from sklearn.cluster import KMeans
+kmeans = KMeans(n_clusters = 15, random_state = 42)
+df_cluster = df_iniche.drop(df_iniche.columns.difference(list(pop_colors.keys())), axis = 1)
+kmeans.fit(df_cluster)
+y_kmeans = kmeans.predict(df_cluster)
+df_kmeans = pd.DataFrame(y_kmeans, columns = ['kmeans_cluster'])
+df_new_clust = pd.concat([neighborhood_data, df_kmeans], axis = 1)
+
+
